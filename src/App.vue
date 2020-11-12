@@ -40,6 +40,19 @@
         </b-col> <!-- Izquierda -->
 
         <b-col sm="12" lg="8"> <!-- Derecha -->
+
+          <SuggestedMovie v-on:showDetail="showMovieModal"></SuggestedMovie>
+
+          <b-pagination
+            v-if="filteredResults.count"
+            class="mb-3"
+            v-on:change="changePage"
+            v-model="page"
+            :total-rows="filteredResults.count"
+            :per-page="qtyPerPage"
+            :limit="10"
+            align="fill"></b-pagination>
+
           <b-list-group>
             <b-list-group-item variant="dark" class="d-flex justify-content-between align-items-center">
               <h4 class="mb-0 d-inline-block">Mi colección</h4>
@@ -72,22 +85,31 @@
                 <b-col cols="12" md="5" class="mt-2 mt-sm-0">
                   <b-input-group prepend="Estrenada">
                     <b-form-select v-model="filters.watched">
-                      <b-form-select-option value="">Todas</b-form-select-option>
-                      <b-form-select-option value="no">Sin estrenar</b-form-select-option>
-                      <b-form-select-option value="si">Estrenadas</b-form-select-option>
+                      <b-form-select-option :value="null">Todas</b-form-select-option>
+                      <b-form-select-option :value="false">Sin estrenar</b-form-select-option>
+                      <b-form-select-option :value="true">Estrenadas</b-form-select-option>
                     </b-form-select>
                   </b-input-group>
                 </b-col>
               </b-row>
               <b-row class="mt-2 text-center">
-                <b-col>Resultados: <strong>{{ filteredResultsCount() }}</strong></b-col>
+                <b-col>
+                  <b-input-group prepend="Resultados por página">
+                    <b-form-select v-model="qtyPerPage">
+                      <b-form-select-option :value="15">15</b-form-select-option>
+                      <b-form-select-option :value="50">50</b-form-select-option>
+                      <b-form-select-option :value="100">100</b-form-select-option>
+                    </b-form-select>
+                  </b-input-group>
+                </b-col>
+                <b-col>Resultados: <strong>{{ filteredResults.count }}</strong></b-col>
               </b-row>
             </b-list-group-item>
 
             <!-- Listado -->
             <b-list-group-item v-if="!totalMovies()" variant="secondary">Aún no has añadido nada a tu colección :(</b-list-group-item>
-            <b-list-group-item variant="warning" v-if="hasAnyFilter && !filteredResultsCount() && totalMovies()">No hay resultados con estos filtros</b-list-group-item>
-            <b-list-group-item v-for="(movie, key) in filterCollection()" :key="key">
+            <b-list-group-item variant="warning" v-if="hasAnyFilter && !filteredResults.count && totalMovies()">No hay resultados con estos filtros</b-list-group-item>
+            <b-list-group-item v-for="(movie, key) in filteredResults.items" :key="key">
               <b-row>
                 <b-col md="12">
                   <div class="text-truncate text-left font-weight-bold">
@@ -113,6 +135,17 @@
             </b-list-group-item>
 
           </b-list-group>
+
+          <b-pagination
+            v-if="filteredResults.count"
+            class="mt-3"
+            v-on:change="changePage"
+            v-model="page"
+            :total-rows="filteredResults.count"
+            :per-page="qtyPerPage"
+            :limit="10"
+            align="fill"></b-pagination>
+
         </b-col> <!-- Derecha -->
       </b-row>
     </b-container>
@@ -214,6 +247,11 @@
     <!-- Modal de detalle -->
     <b-modal size="lg" id="detail-movie-modal" :title="`Detalle: ${detailMovie['Título']}`" ok-only>
       <b-container id="detail-content">
+        <b-row class="mb-3" v-if="suggestedToday && suggestedToday.id === detailMovie.ID">
+          <b-col class="text-center">
+            <b-badge variant="info">SUGERIDA HOY</b-badge>
+          </b-col>
+        </b-row>
         <b-row v-for="(value, key) in detailMovie" :key="key">
           <b-col cols="4" class="text-right">
             <strong>{{ key }}</strong>
@@ -234,17 +272,36 @@ import { mapState } from 'vuex'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'bootstrap-vue/dist/bootstrap-vue-icons.min.css'
+import SuggestedMovie from '@/components/SuggestedMovie.vue'
 
 export default {
   name: 'App',
+  components: { SuggestedMovie },
   computed: {
-    ...mapState([ 'movieCollection', 'totalSpent' ]),
+    ...mapState([ 'movieCollection', 'totalSpent', 'suggestedToday' ]),
     hasAnyFilter(){
-      return this.filters.title.length || this.filters.cost.length || this.filters.watched.length
+      return this.filters.title.length || this.filters.cost.length
+    }
+  },
+  watch: {
+    movieCollection(){
+      this.filterCollection()
+    },
+    hasAnyFilter(){
+      this.filterCollection()
+    },
+    'filters.watched': function(){
+      this.filterCollection()
+    },
+    qtyPerPage(){
+      this.page = 1
+      this.filterCollection()
     }
   },
   data: function(){
     return {
+      page: 1,
+      qtyPerPage: 15,
       stores: {
         'amazon': 'Amazon',
         'elcorteingles': 'El corte Inglés',
@@ -270,27 +327,34 @@ export default {
       filters: {
         title: '',
         cost: '',
-        watched: ''
+        watched: null
       },
-      detailMovie: {}
+      detailMovie: {},
+      filteredResults: {
+        items: {},
+        count: 0
+      }
     }
   },
   methods: {
-    showMovie(id){
-      this.detailMovie = {
-        'ID': this.movieCollection[id].id,
-        'Título': this.movieCollection[id].title,
-        'Coste': this.movieCollection[id].cost + ' €',
-        'Tienda': this.stores[this.movieCollection[id].store],
-        'Estrenada': +this.movieCollection[id].watched ? 'Sí' : 'No',
-        'Fecha de inclusión': this.formatDate(this.movieCollection[id].addDate)
-      }
+    changePage(page){
+      this.page = page
+      this.filterCollection()
     },
-    filteredResultsCount(){
-      return Object.keys(this.filterCollection()).length
+    showMovie(id){
+      this.$store.dispatch({ type: 'getMovie', id }).then(movie => {
+        this.detailMovie = {
+          'ID': movie.id,
+          'Título': movie.title,
+          'Coste': movie.cost + ' €',
+          'Tienda': this.stores[movie.store],
+          'Estrenada': +movie.watched ? 'Sí' : 'No',
+          'Fecha de inclusión': this.formatDate(movie.addDate)
+        }
+      })
     },
     totalMovies(){
-      return Object.keys(this.movieCollection).length
+      return this.movieCollection.length
     },
     giftMovies(){
       let total = 0
@@ -313,12 +377,13 @@ export default {
       return new Date(date).toLocaleString().split(' ').shift()
     },
     filterCollection(){
-      return Object.values(this.movieCollection).reverse().reduce((acc, item) => {
-        if(this.filterItem(item)){
-          acc[item.id] = item
-        }
-        return acc
-      }, {})
+      let items = this.movieCollection.slice().reverse().filter(this.filterItem)
+      const count = items.length
+      items = items.splice(this.qtyPerPage * (this.page - 1), this.qtyPerPage)
+      this.filteredResults = {
+        items: items,
+        count: count
+      }
     },
     filterItem(item){
       let isOk = true
@@ -332,10 +397,8 @@ export default {
           isOk = false
         }
       }
-      if(this.filters.watched){
-        if(this.filters.watched === 'si' && !+item.watched){
-          isOk = false
-        }else if(this.filters.watched === 'no' && +item.watched){
+      if(this.filters.watched !== null){
+        if(+this.filters.watched !== +(item.watched || 0)){
           isOk = false
         }
       }
@@ -382,11 +445,13 @@ export default {
       }
     },
     removeMovie(id){
-      const title = this.movieCollection[id].title
-      if(confirm(`¿Eliminar de la colección "${title}"?`)){
-        this.$store.commit('removeMovie', id)
-        this.showToast('Eliminado', `Has eliminado "${title}"`, 'success')
-      }
+      this.$store.dispatch({ type: 'getMovie', id }).then(res => {
+        const title = res.title
+        if(confirm(`¿Eliminar de la colección "${title}"?`)){
+          this.$store.commit('removeMovie', id)
+          this.showToast('Eliminado', `Has eliminado "${title}"`, 'success')
+        }
+      })
     },
     exportCollection(){
       const str = JSON.stringify({
@@ -402,18 +467,22 @@ export default {
       const str = atob(this.importCode)
       try{
         const data = JSON.parse(str)
-        // Compatibilidad con el formato anterior
-        if(Array.isArray(data.movieCollection)){
-          data.movieCollection = data.movieCollection.reduce((acc, movie) => {
-            if(!movie.id){
-              movie.id = this.newId()
-            }
+        data.movieCollection = data.movieCollection.map(movie => {
+          if(!movie.id){
+            movie.id = this.newId()
+          }
+          if(typeof movie.watched === 'undefined'){
             movie.watched = 1
+          }else{
+            movie.watched = !!+movie.watched
+          }
+          if(!movie.addDate){
             movie.addDate = Date.now()
-            acc[movie.id] = movie
-            return acc
-          }, {})
-        }
+          }else{
+            movie.addDate = +movie.addDate
+          }
+          return movie
+        })
         this.$store.commit('importCollection', data)
         this.showToast('Importado', 'Colección importada con éxito', 'success')
       }catch(e){
@@ -421,11 +490,13 @@ export default {
       }
     },
     editMovie(id){
-      this.editMovieData.id = this.movieCollection[id].id
-      this.editMovieData.title = this.movieCollection[id].title
-      this.editMovieData.cost = +this.movieCollection[id].cost
-      this.editMovieData.watched = +this.movieCollection[id].watched
-      this.editMovieData.store = this.movieCollection[id].store
+      this.$store.dispatch({ type: 'getMovie', id }).then(movie => {
+        this.editMovieData.id = movie.id
+        this.editMovieData.title = movie.title
+        this.editMovieData.cost = +movie.cost
+        this.editMovieData.watched = +movie.watched
+        this.editMovieData.store = movie.store
+      })
     },
     confirmEditMovie(){
       this.$store.commit('editMovie', {
@@ -450,7 +521,13 @@ export default {
         solid: true,
         toaster: 'b-toaster-top-center'
       })
+    },
+    showMovieModal(id){
+      this.showMovie(id)
+      this.$bvModal.show('detail-movie-modal')
     }
+  },
+  mounted(){
   }
 }
 </script>
