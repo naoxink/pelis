@@ -20,6 +20,8 @@ requestDB.onsuccess = function(e){
     baseState.movieCollection = collection
     // No pelis, no party
     if(!collection.length) return false
+    // Calcular el total invertido
+    baseState.totalSpent = recalculateTotalSpent(baseState)
     // Miramos si la que hay guardada en el localStorage es la sugerida de hoy
     const suggestedFromLocal = getFromLocalStorage('config.suggestedToday')
     if(suggestedFromLocal && isToday(suggestedFromLocal.date)){
@@ -137,6 +139,13 @@ const baseState = {
   suggestedToday: {
     date: null,
     id: ''
+  },
+  stores: {
+    'amazon': 'Amazon',
+    'elcorteingles': 'El corte Inglés',
+    'fnac': 'Fnac',
+    'cex': 'Cex',
+    'carrefour': 'Carrefour'
   }
 }
 

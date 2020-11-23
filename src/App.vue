@@ -1,25 +1,19 @@
 <template>
   <div id="app">
 
-    <nav class="navbar navbar-dark bg-dark mb-3">
-      <b-container>
-        <a class="navbar-brand" href="#"><b-icon-film class="yellowgreen"></b-icon-film> <span class="d-none d-sm-inline-block">COLECCIÓN DE PELIS</span></a>
-        <b-button class="d-inline-block d-sm-none" variant="success" v-b-modal.add-movie-modal><b-icon-plus></b-icon-plus></b-button>
-        <b-button v-b-modal.options-modal><b-icon-gear-fill></b-icon-gear-fill> <span class="d-none d-sm-inline-block">Opciones</span></b-button>
-      </b-container>
-    </nav>
+    <Nav></Nav>
 
     <b-container>
       <b-row>
         <b-col sm="12" lg="4"> <!-- Izquierda -->
-          <b-alert variant="info" show>
-            <strong>Resumen</strong>
-            <hr>
-            <div>Total de películas: <strong>{{ totalMovies() }}</strong></div>
-            <div v-if="giftMovies()">Películas que me han regalado: <strong>{{ giftMovies() }}</strong></div>
-            <div v-if="unwatchedMovies()">Películas por estrenar: <strong>{{ unwatchedMovies() }}</strong></div>
-            <div>Dinero total invertido: <strong>{{ totalSpent }} €</strong></div>
-          </b-alert>
+
+          <Resume
+            :totalSpent="totalSpent"
+            :totalMovies="totalMovies()"
+            :giftMovies="giftMovies()"
+            :unwatchedMovies="unwatchedMovies()"
+          ></Resume>
+
           <b-alert variant="light" show class="d-none d-sm-block">
             <strong>Añadir película</strong>
             <hr>
@@ -102,6 +96,21 @@
                     </b-form-select>
                   </b-input-group>
                 </b-col>
+                <b-col>
+                  <b-input-group prepend="Ordenar">
+                    <b-form-select v-model="filters.sort.field">
+                      <b-form-select-option value="title">Título</b-form-select-option>
+                      <b-form-select-option value="cost">Coste</b-form-select-option>
+                      <b-form-select-option value="addDate">Fecha añadida</b-form-select-option>
+                    </b-form-select>
+                    <b-form-select v-model="filters.sort.order">
+                      <b-form-select-option :value="1">Asc</b-form-select-option>
+                      <b-form-select-option :value="-1">Desc</b-form-select-option>
+                    </b-form-select>
+                  </b-input-group>
+                </b-col>
+              </b-row>
+              <b-row>
                 <b-col>Resultados: <strong>{{ filteredResults.count }}</strong></b-col>
               </b-row>
             </b-list-group-item>
@@ -151,118 +160,16 @@
     </b-container>
 
     <!-- Modal añadir película (móvil) -->
-    <b-modal title="Añadir película" id="add-movie-modal">
-      <b-input-group size="md" prepend="Título">
-        <b-form-input id="new-movie-title-modal" v-model="addMovieData.title" @keyup.enter="addMovie"></b-form-input>
-      </b-input-group>
-      <b-input-group size="md" prepend="Precio" append="€" class="mt-2">
-        <b-form-input v-model="addMovieData.cost" @keyup.enter="addMovie"></b-form-input>
-      </b-input-group>
-      <b-input-group prepend="Tienda" class="mt-2">
-        <b-form-select v-model="addMovieData.store">
-          <b-form-select-option value=""></b-form-select-option>
-          <b-form-select-option v-for="(label, key) in stores" :key="key" :value="key">{{ label }}</b-form-select-option>
-        </b-form-select>
-      </b-input-group>
-      <b-row>
-        <b-col sm="12" md="6" offset-md="3" class="text-center mt-3">
-          <b-button @click="addMovie" block variant="success">Añadir a la colección</b-button>
-        </b-col>
-      </b-row>
-    </b-modal>
+    <AddMovieModal></AddMovieModal>
 
     <!-- Modal de opciones -->
-    <b-modal id="options-modal" title="Opciones" ok-only>
-      <!-- Exportar colección -->
-      <b-row class="mb-3">
-          <b-col>
-            <b-alert variant="info" show>
-              <b-button block variant="info" v-if="!exportCode" @click="exportCollection">Exportar colección</b-button>
-              <b-textarea rows="6" v-if="exportCode" :value="exportCode"></b-textarea>
-              <b-button block v-if="exportCode" @click="clearExportCode">Cerrar</b-button>
-            </b-alert>
-          </b-col>
-      </b-row>
-      <!-- Importar colección -->
-      <b-row class="mb-3">
-          <b-col>
-            <b-alert variant="warning" show>
-              <b-button block variant="warning" @click="showImportTextarea = true" v-if="!showImportTextarea">Importar colección</b-button>
-              <b-textarea rows="6" v-if="showImportTextarea" v-model="importCode"></b-textarea>
-              <b-button variant="success" class="mr-2" v-if="importCode.length" @click="importCollection">Importar colección</b-button>
-              <b-button v-if="showImportTextarea" @click="importCode = '';showImportTextarea = false">Cancelar</b-button>
-              <div class="text-center mt-2" v-if="importCode.length"><small><strong>¡Esto sobrescribirá la colección actual! ¡No se puede deshacer!</strong></small></div>
-            </b-alert>
-          </b-col>
-      </b-row>
-      <!-- Eliminar colección -->
-      <b-row>
-        <b-col>
-          <b-alert variant="danger" show>
-            <h5><b-icon-exclamation-triangle></b-icon-exclamation-triangle> Zona peligrosa</h5>
-            <hr>
-            <b-button variant="danger" block @click="clearCollection">Eliminar la colección al completo</b-button>
-          </b-alert>
-        </b-col>
-      </b-row>
-    </b-modal>
+    <OptionsModal></OptionsModal>
 
     <!-- Modal de edición -->
-    <b-modal id="edit-movie" title="Editar película" @ok="confirmEditMovie" @hidden="resetEditMovie">
-      <b-row>
-        <b-col cols="12">id: <code>{{ editMovieData.id }}</code></b-col>
-      </b-row>
-      <b-row class="mt-3">
-        <b-col cols="12">
-          <b-input-group size="md" prepend="Título">
-            <b-form-input id="new-movie-title" v-model="editMovieData.title" @keyup.enter="confirmEditMovie"></b-form-input>
-          </b-input-group>
-        </b-col>
-        <b-col cols="12" sm="6" class="mt-2">
-          <b-input-group size="md" prepend="Precio" append="€">
-            <b-form-input v-model="editMovieData.cost" @keyup.enter="confirmEditMovie"></b-form-input>
-          </b-input-group>
-        </b-col>
-        <b-col cols="12" sm="6" class="mt-2">
-          <b-input-group prepend="Tienda">
-            <b-form-select v-model="editMovieData.store">
-              <b-form-select-option value=""></b-form-select-option>
-              <b-form-select-option v-for="(label, key) in stores" :key="key" :value="key">{{ label }}</b-form-select-option>
-            </b-form-select>
-          </b-input-group>
-        </b-col>
-      </b-row>
-      <b-row class="mt-2">
-        <b-col>
-          <b-input-group prepend="Estrenada">
-            <b-form-select v-model="editMovieData.watched">
-              <b-form-select-option value="0">No</b-form-select-option>
-              <b-form-select-option value="1">Sí</b-form-select-option>
-            </b-form-select>
-          </b-input-group>
-        </b-col>
-      </b-row>
-    </b-modal>
+    <EditModal :movie="editMovieData" v-on:confirmEditMovie="confirmEditMovie" v-on:resetEditMovie="resetEditMovie"></EditModal>
 
     <!-- Modal de detalle -->
-    <b-modal size="lg" id="detail-movie-modal" :title="`Detalle: ${detailMovie['Título']}`" ok-only>
-      <b-container id="detail-content">
-        <b-row class="mb-3" v-if="suggestedToday && suggestedToday.id === detailMovie.ID">
-          <b-col class="text-center">
-            <b-badge variant="info">SUGERIDA HOY</b-badge>
-          </b-col>
-        </b-row>
-        <b-row v-for="(value, key) in detailMovie" :key="key">
-          <b-col cols="4" class="text-right">
-            <strong>{{ key }}</strong>
-          </b-col>
-          <b-col cols="8">
-            <code v-if="key === 'ID'" class="text-truncate d-block">{{ value }}</code>
-            <span v-else>{{ value }}</span>
-          </b-col>
-        </b-row>
-      </b-container>
-    </b-modal>
+    <DetailModal v-on:removeMovie="removeMovie($event)" v-on:editMovie="editMovie($event)" :movie="detailMovie"></DetailModal>
 
   </div>
 </template>
@@ -272,13 +179,29 @@ import { mapState } from 'vuex'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import 'bootstrap-vue/dist/bootstrap-vue-icons.min.css'
+import mixins from '@/mixins'
 import SuggestedMovie from '@/components/SuggestedMovie.vue'
+import DetailModal from '@/components/DetailModal.vue'
+import EditModal from '@/components/EditModal.vue'
+import OptionsModal from '@/components/OptionsModal.vue'
+import AddMovieModal from '@/components/AddMovieModal.vue'
+import Resume from '@/components/Resume.vue'
+import Nav from '@/components/Nav.vue'
 
 export default {
   name: 'App',
-  components: { SuggestedMovie },
+  components: { SuggestedMovie, DetailModal, EditModal, OptionsModal, AddMovieModal, Resume, Nav },
+  mixins: [ mixins ],
   computed: {
-    ...mapState([ 'movieCollection', 'totalSpent', 'suggestedToday' ]),
+    ...mapState([
+      'movieCollection',
+      'totalSpent',
+      'suggestedToday',
+      'stores',
+      'exportCode',
+      'importCode',
+      'showImportTextarea'
+    ]),
     hasAnyFilter(){
       return this.filters.title.length || this.filters.cost.length
     }
@@ -296,18 +219,18 @@ export default {
     qtyPerPage(){
       this.page = 1
       this.filterCollection()
-    }
+    },
+    'filters.sort.field': function(){
+      this.filterCollection()
+    },
+    'filters.sort.order': function(){
+      this.filterCollection()
+    },
   },
   data: function(){
     return {
       page: 1,
       qtyPerPage: 15,
-      stores: {
-        'amazon': 'Amazon',
-        'elcorteingles': 'El corte Inglés',
-        'fnac': 'Fnac',
-        'cex': 'Cex'
-      },
       addMovieData: {
         title: '',
         cost: 0,
@@ -320,14 +243,15 @@ export default {
         watched: 0,
         store: ''
       },
-      exportCode: '',
-      importCode: '',
-      showImportTextarea: false,
       showFilters: false,
       filters: {
         title: '',
         cost: '',
-        watched: null
+        watched: null,
+        sort: {
+          field: 'addDate',
+          order: -1
+        }
       },
       detailMovie: {},
       filteredResults: {
@@ -376,8 +300,29 @@ export default {
     formatDate(date){
       return new Date(date).toLocaleString().split(' ').shift()
     },
+    sortItems(items){
+      const value = this.filters.sort.order
+      return items.sort((a, b) => {
+          if(a[this.filters.sort.field] > b[this.filters.sort.field]){
+            return value
+          }else if(a[this.filters.sort.field] < b[this.filters.sort.field]){
+            return value * -1
+          }else{
+            return 0
+          }
+        })
+    },
     filterCollection(){
-      let items = this.movieCollection.slice().reverse().filter(this.filterItem)
+      if(!this.movieCollection || !this.movieCollection.length){
+        return false
+      }
+      let items = this.movieCollection.slice().filter(this.filterItem)
+      if(this.filters.sort.field){
+        // FIXME: Parece que ordena por página, lo que no tiene sentido
+        //        porque todavía no se han separado los elementos :/
+        // items = this.sortItems(items)
+      }
+      items = items.reverse()
       const count = items.length
       items = items.splice(this.qtyPerPage * (this.page - 1), this.qtyPerPage)
       this.filteredResults = {
@@ -428,11 +373,7 @@ export default {
         cost: _.addMovieData.cost,
         store: _.addMovieData.store
       })
-      if(document.querySelector('#new-movie-title-modal')){
-        document.querySelector('#new-movie-title-modal').focus()
-      }else{
-        document.querySelector('#new-movie-title').focus()
-      }
+      document.querySelector('#new-movie-title').focus()
       this.showToast('Añadida', `Se ha añadido "${this.addMovieData.title}" a la colección con un coste de ${this.addMovieData.cost}€`, 'success')
       this.addMovieData.title = ''
       this.addMovieData.cost = 0
@@ -528,6 +469,7 @@ export default {
     }
   },
   mounted(){
+    this.filterCollection()
   }
 }
 </script>
