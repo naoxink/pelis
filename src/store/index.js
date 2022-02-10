@@ -155,8 +155,10 @@ export default new Vuex.Store({
     setCollection(state, collection){
       state.movieCollection = collection
     },
-    addMovie(state, data){
-      data.addDate = Date.now()
+    addMovie: async (state, data) => {
+      if(!data.addDate){
+        data.addDate = Date.now()
+      }
       addToDB(data).then(() => {
         state.movieCollection.push(data)
         state.totalSpent += +data.cost
@@ -164,7 +166,8 @@ export default new Vuex.Store({
     },
     clearCollection(state){
       clearDB().then(() => {
-        state.movieCollection = []
+        location.reload()
+        state.movieCollection = {}
         state.totalSpent = 0
       })
     },
@@ -194,7 +197,7 @@ export default new Vuex.Store({
   actions: {
     getMovie({ commit, state }, data){
       return getFromDB(data.id)
-    }
+    },
   },
   modules: {
   },

@@ -22,6 +22,15 @@
           </b-alert>
         </b-col>
     </b-row>
+    <!-- Importar desde CSV de IMDB -->
+    <b-row class="mb-3">
+      <b-col>
+        <b-alert variant="warning" show>
+          <strong>Importar CSV de IMDB</strong>
+          <input type="file" @change="readFile">
+        </b-alert>
+      </b-col>
+    </b-row>
     <!-- Eliminar colección -->
     <b-row>
       <b-col>
@@ -51,10 +60,18 @@
       return {
         showImportTextarea: false,
         importCode: '',
-        exportCode: ''
+        exportCode: '',
       }
     },
     methods: {
+      readFile: async function(event) {
+        const file = event.target.files[0]
+        const fr = new FileReader()
+        fr.onload = () => {
+          this.readImdbCSV(fr.result)
+        }
+        fr.readAsText(file)
+      },
       clearCollection(){
         if(confirm('Vas a ELIMINAR POR COMPLETO la colección ¿estás seguro/a?')){
           this.$store.commit('clearCollection')

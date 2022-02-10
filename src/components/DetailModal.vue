@@ -1,7 +1,7 @@
 <template>
   <b-modal v-if="movie" size="lg" id="detail-movie-modal" :title="`Detalle: ${movie['Título']}`" ok-only>
     <b-container id="detail-content">
-      
+
       <b-row v-for="(value, key) in movie" :key="key">
         <b-col cols="4" class="text-right">
           <strong>{{ key }}</strong>
@@ -15,6 +15,14 @@
         <b-col cols="4"></b-col>
         <b-col class="text-left">
           <b-badge variant="info">SUGERIDA HOY</b-badge>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col cols="4" class="text-right">
+          <strong>IMDB link</strong>
+        </b-col>
+        <b-col cols="8">
+          <a target="_blank" :href="imdbLink(movie)">{{ movie['Título'] }}</a>
         </b-col>
       </b-row>
       <hr>
@@ -38,6 +46,9 @@
     props: [ 'movie' ],
     computed: {
       ...mapState([ 'suggestedToday' ])
+    },
+    methods: {
+      imdbLink: (movie) => `https://imdb.com/title/${movie.ID}`
     }
   }
 </script>

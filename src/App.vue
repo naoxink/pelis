@@ -298,7 +298,7 @@ export default {
       }, 0)
     },
     formatDate(date){
-      return new Date(date).toLocaleString().split(' ').shift()
+      return new Date(date).toLocaleString().split(', ').shift()
     },
     sortItems(items){
       const value = this.filters.sort.order
