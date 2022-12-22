@@ -4,34 +4,34 @@ import Vuex from 'vuex'
 const requestDB = window.indexedDB.open('pelisDB', 1)
 let db = null
 
-requestDB.onerror = function(e){
+requestDB.onerror = function (e) {
   throw new Error(e.target.errorCode)
 }
 
-requestDB.onupgradeneeded = function(e){
+requestDB.onupgradeneeded = function (e) {
   db = e.target.result
   const objStore = db.createObjectStore('collection', { keyPath: 'id' })
   objStore.createIndex('id', 'id', { unique: true })
 }
 
-requestDB.onsuccess = function(e){
+requestDB.onsuccess = function (e) {
   db = e.target.result
   getAllFromDB().then((collection) => {
     baseState.movieCollection = collection
     // No pelis, no party
-    if(!collection.length) return false
+    if (!collection.length) return false
     // Calcular el total invertido
     baseState.totalSpent = recalculateTotalSpent(baseState)
     // Miramos si la que hay guardada en el localStorage es la sugerida de hoy
     const suggestedFromLocal = getFromLocalStorage('config.suggestedToday')
-    if(suggestedFromLocal && isToday(suggestedFromLocal.date)){
+    if (suggestedFromLocal && isToday(suggestedFromLocal.date)) {
       getFromDB(suggestedFromLocal.id).then(item => {
-        if(item){
+        if (item) {
           baseState.suggestedToday = {
             date: item.date,
             id: item.id
           }
-        }else{
+        } else {
           const suggestedTodayNew = {
             date: Date.now(),
             id: collection[random(0, collection.length - 1)].id
@@ -40,8 +40,8 @@ requestDB.onsuccess = function(e){
           setToLocalStorage('config.suggestedToday', suggestedTodayNew)
         }
       })
-      
-    }else{
+
+    } else {
       const suggestedTodayNew = {
         date: Date.now(),
         id: collection[random(0, collection.length - 1)].id
@@ -60,7 +60,7 @@ const recalculateTotalSpent = state => {
     return acc
   }, 0)
   let total = 0
-  for(let id in state.movieCollection){
+  for (let id in state.movieCollection) {
     total += +state.movieCollection[id].cost
   }
   return total
@@ -79,9 +79,9 @@ const isToday = time => {
 const addToDB = data => new Promise((resolve, reject) => {
   const transaction = db.transaction(['collection'], 'readwrite')
   const objStore = transaction.objectStore('collection')
-  if(Array.isArray(data)){
+  if (Array.isArray(data)) {
     data.forEach(item => objStore.add(item))
-  }else{
+  } else {
     objStore.add(data)
   }
   transaction.onerror = e => reject(e)
@@ -131,7 +131,7 @@ const clearDB = () => new Promise((resolve, reject) => {
 
 const getFromLocalStorage = key => JSON.parse(window.localStorage.getItem(key))
 
-const setToLocalStorage = (key, data) => window.localStorage.setItem(key, JSON.stringify(data))
+const setToLocalStorage = (key, data) => window.localStorage.setItem(key, JSON.stringify(data))
 
 const baseState = {
   movieCollection: {},
@@ -152,11 +152,11 @@ const baseState = {
 export default new Vuex.Store({
   state: baseState,
   mutations: {
-    setCollection(state, collection){
+    setCollection(state, collection) {
       state.movieCollection = collection
     },
     addMovie: async (state, data) => {
-      if(!data.addDate){
+      if (!data.addDate) {
         data.addDate = Date.now()
       }
       addToDB(data).then(() => {
@@ -164,21 +164,21 @@ export default new Vuex.Store({
         state.totalSpent += +data.cost
       })
     },
-    clearCollection(state){
+    clearCollection(state) {
       clearDB().then(() => {
         location.reload()
         state.movieCollection = {}
         state.totalSpent = 0
       })
     },
-    removeMovie(state, id){
+    removeMovie(state, id) {
       removeFromDB(id).then(() => {
         const index = state.movieCollection.findIndex(m => m.id === id)
         Vue.delete(state.movieCollection, index)
-        state.totalSpent = recalculateTotalSpent(state)  
+        state.totalSpent = recalculateTotalSpent(state)
       })
     },
-    importCollection(state, data){
+    importCollection(state, data) {
       clearDB().then((e) => {
         addToDB(data.movieCollection).then(e => {
           state.movieCollection = data.movieCollection
@@ -186,16 +186,19 @@ export default new Vuex.Store({
         })
       })
     },
-    editMovie(state, data){
+    editMovie(state, data) {
       updateFromDB(data.id, data).then(updatedMovie => {
         const index = state.movieCollection.findIndex(item => item.id === data.id)
         Vue.set(state.movieCollection, index, updatedMovie)
-        state.totalSpent = recalculateTotalSpent(state)  
+        state.totalSpent = recalculateTotalSpent(state)
       })
+    },
+    forceRecalcTotalSpent(state) {
+      state.totalSpent = recalculateTotalSpent(state)
     }
   },
   actions: {
-    getMovie({ commit, state }, data){
+    getMovie({ commit, state }, data) {
       return getFromDB(data.id)
     },
   },
