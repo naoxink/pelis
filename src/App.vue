@@ -14,42 +14,11 @@
             :unwatchedMovies="unwatchedMovies()"
           ></Resume>
 
-          <b-alert variant="light" show class="d-none d-sm-block">
-            <strong>Añadir película</strong>
-            <hr />
-            <b-input-group size="md" prepend="Título">
-              <b-form-input
-                id="new-movie-title"
-                v-model="addMovieData.title"
-                @keyup.enter="addMovie"
-              ></b-form-input>
-            </b-input-group>
-            <b-input-group size="md" prepend="Precio" append="€" class="mt-2">
-              <b-form-input
-                v-model="addMovieData.cost"
-                @keyup.enter="addMovie"
-              ></b-form-input>
-            </b-input-group>
-            <b-input-group prepend="Tienda" class="mt-2">
-              <b-form-select v-model="addMovieData.store">
-                <b-form-select-option value=""></b-form-select-option>
-                <b-form-select-option
-                  v-for="(label, key) in stores"
-                  :key="key"
-                  :value="key"
-                  >{{ label }}</b-form-select-option
-                >
-              </b-form-select>
-            </b-input-group>
-            <b-button
-              @click="addMovie"
-              class="mt-2"
-              block
-              size="md"
-              variant="success"
-              >Añadir a la colección</b-button
+          <b-card>
+            <b-button variant="success" v-b-modal.add-movie-modal
+              ><b-icon-plus></b-icon-plus> Añadir película</b-button
             >
-          </b-alert>
+          </b-card>
         </b-col>
         <!-- Izquierda -->
 
@@ -101,16 +70,16 @@
                         >Gratis</b-form-select-option
                       >
                       <b-form-select-option value="<5"
-                        >< 5€</b-form-select-option
+                        >&lt; 5€</b-form-select-option
                       >
                       <b-form-select-option value="<10"
-                        >< 10€</b-form-select-option
+                        >&lt; 10€</b-form-select-option
                       >
                       <b-form-select-option value="10&50"
-                        >> 10€ && < 50€</b-form-select-option
+                        >&gt; 10€ &amp;&amp; &lt; 50€</b-form-select-option
                       >
                       <b-form-select-option value=">50"
-                        >> 50€</b-form-select-option
+                        >&gt; 50€</b-form-select-option
                       >
                     </b-form-select>
                   </b-input-group>
@@ -198,7 +167,7 @@
                     <a
                       href="#"
                       v-b-modal.detail-movie-modal
-                      @click.prevent="showMovie(movie.id)"
+                      @click.prevent="showMovie(movie)"
                       >{{ movie.title }}</a
                     >
                   </div>
@@ -361,6 +330,7 @@ export default {
         title: "",
         cost: 0,
         store: "",
+        imdbLink: "",
       },
       editMovieData: {
         id: "",
@@ -368,6 +338,8 @@ export default {
         cost: "",
         watched: 0,
         store: "",
+        imdbLink: "",
+        addDate: null,
       },
       showFilters: false,
       filters: {
@@ -379,7 +351,7 @@ export default {
           order: -1,
         },
       },
-      detailMovie: {},
+      detailMovie: null,
       filteredResults: {
         items: {},
         count: 0,
@@ -391,17 +363,18 @@ export default {
       this.page = page;
       this.filterCollection();
     },
-    showMovie(id) {
-      this.$store.dispatch({ type: "getMovie", id }).then((movie) => {
+    showMovie(movie) {
+      // this.$store.dispatch({ type: "getMovie", id }).then((movie) => {
         this.detailMovie = {
           ID: movie.id,
           Título: movie.title,
           Coste: movie.cost + " €",
           Tienda: this.stores[movie.store],
           Estrenada: +movie.watched ? "Sí" : "No",
-          "Fecha de inclusión": this.formatDate(movie.addDate),
+          'Fecha de inclusión': this.formatDate(movie.addDate),
+          'Enlace IMDb': movie.imdbLink
         };
-      });
+      // });
     },
     totalMovies() {
       return this.movieCollection.length;
@@ -502,6 +475,7 @@ export default {
         title: _.addMovieData.title,
         cost: _.addMovieData.cost,
         store: _.addMovieData.store,
+        imdbLink: _.addMovieData.imdbLink,
       });
       document.querySelector("#new-movie-title").focus();
       this.showToast(
@@ -512,6 +486,7 @@ export default {
       this.addMovieData.title = "";
       this.addMovieData.cost = 0;
       this.addMovieData.store = "";
+      this.addMovieData.imdbLink = "";
     },
     clearCollection() {
       if (
@@ -577,6 +552,8 @@ export default {
         this.editMovieData.cost = +movie.cost;
         this.editMovieData.watched = +movie.watched;
         this.editMovieData.store = movie.store;
+        this.editMovieData.imdbLink = movie.imdbLink;
+        this.editMovieData.addDate = new Date(movie.addDate);
       });
     },
     confirmEditMovie() {
@@ -586,6 +563,8 @@ export default {
         cost: +this.editMovieData.cost,
         watched: +this.editMovieData.watched,
         store: this.editMovieData.store,
+        imdbLink: this.editMovieData.imdbLink,
+        addDate: this.editMovieData.addDate,
       });
       this.showToast(
         "Editado",

@@ -20,6 +20,7 @@ export default {
         const id = movie[1]
         const dateWatched = movie[16]
         const title = movie[5]
+        const imdbLink = movie[6]
         if(!id) return false
 
         this.$store.commit('addMovie', {
@@ -29,10 +30,9 @@ export default {
           'addDate': new Date(dateWatched).getTime(),
           'title': title,
           'watched': !!dateWatched,
+          'imdbLink': imdbLink
         })
       })
-      // alert('Importado!')
-      // this.$store.commit('cleanCache')
     },
     csvToArray(text) {
         let p = '', row = [''], ret = [row], i = 0, r = 0, s = !0, l;

@@ -59,11 +59,6 @@ const recalculateTotalSpent = state => {
     acc += +item.cost
     return acc
   }, 0)
-  let total = 0
-  for (let id in state.movieCollection) {
-    total += +state.movieCollection[id].cost
-  }
-  return total
 }
 
 const random = (min, max) => {

@@ -12,6 +12,9 @@
         <b-form-select-option v-for="(label, key) in stores" :key="key" :value="key">{{ label }}</b-form-select-option>
       </b-form-select>
     </b-input-group>
+    <b-input-group size="md" prepend="IMDb link">
+      <b-form-input v-model="movie.imdbLink" @keyup.enter="addMovie"></b-form-input>
+    </b-input-group>
     <b-row>
       <b-col sm="12" md="6" offset-md="3" class="text-center mt-3">
         <b-button @click="addMovie" block variant="success">Añadir a la colección</b-button>
@@ -34,7 +37,8 @@
         movie: {
           title: '',
           cost: 0,
-          store: ''
+          store: '',
+          imdbLink: ''
         }
       }
     },
@@ -46,13 +50,15 @@
           id: _.newId(),
           title: _.movie.title,
           cost: _.movie.cost,
-          store: _.movie.store
+          store: _.movie.store,
+          imdbLink: _.movie.imdbLink
         })
         document.querySelector('#new-movie-title-modal').focus()
         this.showToast('Añadida', `Se ha añadido "${this.movie.title}" a la colección con un coste de ${this.movie.cost}€`, 'success')
         this.movie.title = ''
         this.movie.cost = 0
         this.movie.store = ''
+        this.movie.imdbLink = ''
       },
     }
   }
