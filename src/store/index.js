@@ -145,7 +145,10 @@ const baseState = {
     'elcorteingles': 'El corte Inglés',
     'fnac': 'Fnac',
     'cex': 'Cex',
-    'carrefour': 'Carrefour'
+    'carrefour': 'Carrefour',
+    'selectavision': 'Selecta Visión',
+    'mediamarkt': 'Mediamarkt',
+    'game': 'Game'
   }
 }
 
