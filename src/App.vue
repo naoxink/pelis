@@ -8,7 +8,7 @@
           <!-- Izquierda -->
 
           <Resume
-            :totalSpent="totalSpent"
+            :totalSpent="round2decimals(totalSpent)"
             :totalMovies="totalMovies()"
             :giftMovies="giftMovies()"
             :unwatchedMovies="unwatchedMovies()"
