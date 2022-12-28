@@ -1,132 +1,27 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import {
+  recalculateTotalSpent,
+  random,
+  isToday,
+  addToDB,
+  getFromDB,
+  removeFromDB,
+  updateFromDB,
+  getAllFromDB,
+  clearDB,
+  getList,
+  createList,
+  editList,
+  deleteList,
+  addMovieToList,
+  deleteMovieFromList,
+  getFromLocalStorage,
+  setToLocalStorage
+} from './db.js'
 
-const requestDB = window.indexedDB.open('pelisDB', 1)
-let db = null
-
-requestDB.onerror = function (e) {
-  throw new Error(e.target.errorCode)
-}
-
-requestDB.onupgradeneeded = function (e) {
-  db = e.target.result
-  const objStore = db.createObjectStore('collection', { keyPath: 'id' })
-  objStore.createIndex('id', 'id', { unique: true })
-}
-
-requestDB.onsuccess = function (e) {
-  db = e.target.result
-  getAllFromDB().then((collection) => {
-    baseState.movieCollection = collection
-    // No pelis, no party
-    if (!collection.length) return false
-    // Calcular el total invertido
-    baseState.totalSpent = recalculateTotalSpent(baseState)
-    // Miramos si la que hay guardada en el localStorage es la sugerida de hoy
-    const suggestedFromLocal = getFromLocalStorage('config.suggestedToday')
-    if (suggestedFromLocal && isToday(suggestedFromLocal.date)) {
-      getFromDB(suggestedFromLocal.id).then(item => {
-        if (item) {
-          baseState.suggestedToday = {
-            date: item.date,
-            id: item.id
-          }
-        } else {
-          const suggestedTodayNew = {
-            date: Date.now(),
-            id: collection[random(0, collection.length - 1)].id
-          }
-          baseState.suggestedToday = suggestedTodayNew
-          setToLocalStorage('config.suggestedToday', suggestedTodayNew)
-        }
-      })
-
-    } else {
-      const suggestedTodayNew = {
-        date: Date.now(),
-        id: collection[random(0, collection.length - 1)].id
-      }
-      baseState.suggestedToday = suggestedTodayNew
-      setToLocalStorage('config.suggestedToday', suggestedTodayNew)
-    }
-  })
-}
 
 Vue.use(Vuex)
-
-const recalculateTotalSpent = state => {
-  return state.movieCollection.reduce((acc, item) => {
-    acc += +item.cost
-    return acc
-  }, 0)
-}
-
-const random = (min, max) => {
-  return Math.round(min + Math.random() * (max - min))
-}
-
-const isToday = time => {
-  const date = new Date(+time).toLocaleString().split(' ').shift()
-  const today = new Date().toLocaleString().split(' ').shift()
-  return date === today
-}
-
-const addToDB = data => new Promise((resolve, reject) => {
-  const transaction = db.transaction(['collection'], 'readwrite')
-  const objStore = transaction.objectStore('collection')
-  if (Array.isArray(data)) {
-    data.forEach(item => objStore.add(item))
-  } else {
-    objStore.add(data)
-  }
-  transaction.onerror = e => reject(e)
-  transaction.oncomplete = e => resolve(true)
-})
-
-const getFromDB = id => new Promise((resolve, reject) => {
-  const transaction = db.transaction(['collection'], 'readonly')
-  const objStore = transaction.objectStore('collection')
-  objStore.get(id).onsuccess = e => resolve(e.target.result)
-})
-
-const removeFromDB = id => new Promise((resolve, reject) => {
-  const transaction = db.transaction(['collection'], 'readwrite')
-  const objStore = transaction.objectStore('collection')
-  objStore.delete(id).onsuccess = e => resolve(e)
-})
-
-const updateFromDB = (id, data) => new Promise((resolve, reject) => {
-  const transaction = db.transaction(['collection'], 'readwrite')
-  const objStore = transaction.objectStore('collection')
-  objStore.get(id).onsuccess = e => {
-    const item = e.target.result
-    const updatedData = Object.assign({}, item, data)
-    objStore.put(updatedData).onsuccess = e => {
-      getFromDB(updatedData.id).then(e => resolve(e))
-    }
-  }
-})
-
-const getAllFromDB = () => new Promise((resolve, reject) => {
-  const transaction = db.transaction(['collection'], 'readonly')
-  const objStore = transaction.objectStore('collection')
-  objStore.getAll().onsuccess = e => {
-    e.target.result.sort((a, b) => +a.addDate - +b.addDate)
-    resolve(e.target.result)
-  }
-})
-
-const clearDB = () => new Promise((resolve, reject) => {
-  const transaction = db.transaction(['collection'], 'readwrite')
-  const objStore = transaction.objectStore('collection')
-  objStore.clear().onsuccess = e => {
-    resolve(e)
-  }
-})
-
-const getFromLocalStorage = key => JSON.parse(window.localStorage.getItem(key))
-
-const setToLocalStorage = (key, data) => window.localStorage.setItem(key, JSON.stringify(data))
 
 const baseState = {
   movieCollection: {},

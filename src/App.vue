@@ -15,9 +15,8 @@
           ></Resume>
 
           <b-card>
-            <b-button variant="success" v-b-modal.add-movie-modal
-              ><b-icon-plus></b-icon-plus> Añadir película</b-button
-            >
+            <b-button variant="success" v-b-modal.add-movie-modal>
+              <b-icon-plus></b-icon-plus> Añadir película</b-button>
           </b-card>
         </b-col>
         <!-- Izquierda -->
@@ -41,8 +40,7 @@
           <b-list-group>
             <b-list-group-item
               variant="dark"
-              class="d-flex justify-content-between align-items-center"
-            >
+              class="d-flex justify-content-between align-items-center">
               <h4 class="mb-0 d-inline-block">Mi colección</h4>
               <b-button
                 size="sm"
@@ -66,36 +64,20 @@
                   <b-input-group prepend="Precio">
                     <b-form-select v-model="filters.cost">
                       <b-form-select-option value=""></b-form-select-option>
-                      <b-form-select-option value="0"
-                        >Gratis</b-form-select-option
-                      >
-                      <b-form-select-option value="<5"
-                        >&lt; 5€</b-form-select-option
-                      >
-                      <b-form-select-option value="<10"
-                        >&lt; 10€</b-form-select-option
-                      >
-                      <b-form-select-option value="10&50"
-                        >&gt; 10€ &amp;&amp; &lt; 50€</b-form-select-option
-                      >
-                      <b-form-select-option value=">50"
-                        >&gt; 50€</b-form-select-option
-                      >
+                      <b-form-select-option value="0">Gratis</b-form-select-option>
+                      <b-form-select-option value="<5">&lt; 5€</b-form-select-option>
+                      <b-form-select-option value="<10">&lt; 10€</b-form-select-option>
+                      <b-form-select-option value="10&50">&gt; 10€ &amp;&amp; &lt; 50€</b-form-select-option>
+                      <b-form-select-option value=">50">&gt; 50€</b-form-select-option>
                     </b-form-select>
                   </b-input-group>
                 </b-col>
                 <b-col cols="12" md="5" class="mt-2 mt-sm-0">
                   <b-input-group prepend="Estrenada">
                     <b-form-select v-model="filters.watched">
-                      <b-form-select-option :value="null"
-                        >Todas</b-form-select-option
-                      >
-                      <b-form-select-option :value="false"
-                        >Sin estrenar</b-form-select-option
-                      >
-                      <b-form-select-option :value="true"
-                        >Estrenadas</b-form-select-option
-                      >
+                      <b-form-select-option :value="null">Todas</b-form-select-option>
+                      <b-form-select-option :value="false">Sin estrenar</b-form-select-option>
+                      <b-form-select-option :value="true">Estrenadas</b-form-select-option>
                     </b-form-select>
                   </b-input-group>
                 </b-col>
@@ -104,63 +86,43 @@
                 <b-col>
                   <b-input-group prepend="Resultados por página">
                     <b-form-select v-model="qtyPerPage">
-                      <b-form-select-option :value="15"
-                        >15</b-form-select-option
-                      >
-                      <b-form-select-option :value="50"
-                        >50</b-form-select-option
-                      >
-                      <b-form-select-option :value="100"
-                        >100</b-form-select-option
-                      >
+                      <b-form-select-option :value="15">15</b-form-select-option>
+                      <b-form-select-option :value="50">50</b-form-select-option>
+                      <b-form-select-option :value="100">100</b-form-select-option>
                     </b-form-select>
                   </b-input-group>
                 </b-col>
                 <b-col>
                   <b-input-group prepend="Ordenar">
                     <b-form-select v-model="filters.sort.field">
-                      <b-form-select-option value="title"
-                        >Título</b-form-select-option
-                      >
-                      <b-form-select-option value="cost"
-                        >Coste</b-form-select-option
-                      >
-                      <b-form-select-option value="addDate"
-                        >Fecha añadida</b-form-select-option
-                      >
+                      <b-form-select-option value="title">Título</b-form-select-option>
+                      <b-form-select-option value="cost">Coste</b-form-select-option>
+                      <b-form-select-option value="addDate">Fecha añadida</b-form-select-option>
                     </b-form-select>
                     <b-form-select v-model="filters.sort.order">
-                      <b-form-select-option :value="-1"
-                        >Asc</b-form-select-option
-                      >
-                      <b-form-select-option :value="1"
-                        >Desc</b-form-select-option
-                      >
+                      <b-form-select-option :value="-1">Asc</b-form-select-option>
+                      <b-form-select-option :value="1">Desc</b-form-select-option>
                     </b-form-select>
                   </b-input-group>
                 </b-col>
               </b-row>
               <b-row>
-                <b-col
-                  >Resultados:
-                  <strong>{{ filteredResults.count }}</strong></b-col
-                >
+                <b-col>Resultados:
+                  <strong>{{ filteredResults.count }}</strong>
+                </b-col>
               </b-row>
             </b-list-group-item>
 
             <!-- Listado -->
-            <b-list-group-item v-if="!totalMovies()" variant="secondary"
-              >Aún no has añadido nada a tu colección :(</b-list-group-item
-            >
+            <b-list-group-item v-if="!totalMovies()" variant="secondary">Aún no has añadido nada a tu colección :(</b-list-group-item>
             <b-list-group-item
               variant="warning"
-              v-if="hasAnyFilter && !filteredResults.count && totalMovies()"
-              >No hay resultados con estos filtros</b-list-group-item
-            >
+              v-if="hasAnyFilter && !filteredResults.count && totalMovies()">
+              No hay resultados con estos filtros
+            </b-list-group-item>
             <b-list-group-item
               v-for="(movie, key) in filteredResults.items"
-              :key="key"
-            >
+              :key="key">
               <b-row>
                 <b-col md="12">
                   <div class="text-truncate text-left font-weight-bold">
@@ -168,8 +130,8 @@
                       href="#"
                       v-b-modal.detail-movie-modal
                       @click.prevent="showMovie(movie)"
-                      >{{ movie.title }}</a
-                    >
+                      >{{ movie.title }}
+                    </a>
                   </div>
                 </b-col>
                 <b-col md="12" class="text-right">
