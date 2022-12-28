@@ -1,5 +1,7 @@
 # pelis
 
+[LIVE VERSION @ GitHub](https://naoxink.github.io/pelis/)
+
 ## Project setup
 ```
 npm install
