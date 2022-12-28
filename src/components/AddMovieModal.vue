@@ -12,7 +12,7 @@
         <b-form-select-option v-for="(label, key) in stores" :key="key" :value="key">{{ label }}</b-form-select-option>
       </b-form-select>
     </b-input-group>
-    <b-input-group size="md" prepend="IMDb link">
+    <b-input-group size="md" prepend="IMDb link" class="mt-2">
       <b-form-input v-model="movie.imdbLink" @keyup.enter="addMovie"></b-form-input>
     </b-input-group>
     <b-row>
