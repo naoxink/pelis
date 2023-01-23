@@ -165,7 +165,7 @@ export default {
       fr.onload = () => {
         this.readImdbCSV(fr.result);
       };
-      fr.readAsText(file);
+      fr.readAsText(file, 'UTF-8');
     },
     clearCollection() {
       if (
