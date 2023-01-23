@@ -138,7 +138,10 @@ export default {
       if (!this.exportCode) return false;
       const link = document.createElement("a");
       link.download = "pelis_export.data";
-      link.href = `data:application/json;charset=utf-8;base64,${this.exportCode}`;
+      link.href = `data:application/json;charset=utf-8;%EF%BB%BF;${JSON.stringify({
+        movieCollection: this.movieCollection,
+        totalSpent: this.totalSpent,
+      })}`;
       link.click();
     },
     importCollectionFile(event) {
