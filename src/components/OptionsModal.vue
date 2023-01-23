@@ -138,7 +138,7 @@ export default {
       if (!this.exportCode) return false;
       const link = document.createElement("a");
       link.download = "pelis_export.data";
-      link.href = `data:application/json;base64,${this.exportCode}`;
+      link.href = `data:application/json;charset=utf-8;base64,${this.exportCode}`;
       link.click();
     },
     importCollectionFile(event) {
