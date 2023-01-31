@@ -1,7 +1,7 @@
 const requestDB = window.indexedDB.open('pelisDB', 1)
 let db = null
 
-baseState = {
+const baseState = {
   movieCollection: {},
   totalSpent: 0,
   suggestedToday: {
