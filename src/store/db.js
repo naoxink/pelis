@@ -1,7 +1,7 @@
 const requestDB = window.indexedDB.open('pelisDB', 1)
 let db = null
 
-const baseState = {
+baseState = {
   movieCollection: {},
   totalSpent: 0,
   suggestedToday: {
@@ -206,3 +206,5 @@ export const deleteMovieFromList = (listId, movie) => new Promise((resolve, reje
 export const getFromLocalStorage = key => JSON.parse(window.localStorage.getItem(key))
 
 export const setToLocalStorage = (key, data) => window.localStorage.setItem(key, JSON.stringify(data))
+
+export const baseState = baseState
