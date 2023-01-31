@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import {
+  baseState,
   recalculateTotalSpent,
   random,
   isToday,
@@ -22,25 +23,6 @@ import {
 
 
 Vue.use(Vuex)
-
-const baseState = {
-  movieCollection: {},
-  totalSpent: 0,
-  suggestedToday: {
-    date: null,
-    id: ''
-  },
-  stores: {
-    'amazon': 'Amazon',
-    'elcorteingles': 'El corte Inglés',
-    'fnac': 'Fnac',
-    'cex': 'Cex',
-    'carrefour': 'Carrefour',
-    'selectavision': 'Selecta Visión',
-    'mediamarkt': 'Mediamarkt',
-    'game': 'Game'
-  }
-}
 
 export default new Vuex.Store({
   state: baseState,

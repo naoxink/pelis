@@ -1,6 +1,25 @@
 const requestDB = window.indexedDB.open('pelisDB', 1)
 let db = null
 
+const baseState = {
+  movieCollection: {},
+  totalSpent: 0,
+  suggestedToday: {
+    date: null,
+    id: ''
+  },
+  stores: {
+    'amazon': 'Amazon',
+    'elcorteingles': 'El corte Inglés',
+    'fnac': 'Fnac',
+    'cex': 'Cex',
+    'carrefour': 'Carrefour',
+    'selectavision': 'Selecta Visión',
+    'mediamarkt': 'Mediamarkt',
+    'game': 'Game'
+  }
+}
+
 requestDB.onerror = function (e) {
   throw new Error(e.target.errorCode)
 }
