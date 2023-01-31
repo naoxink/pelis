@@ -138,25 +138,33 @@ export default {
       if (!this.exportCode) return false;
       const link = document.createElement("a");
       link.download = "pelis_export.csv";
-      link.href = `data:text/csv;${this.jsonToCsv(this.movieCollection)}`;
+      link.href = `data:text/csv;charset=utf-8,${this.jsonToCsv(this.movieCollection)}`;
       link.click();
     },
     importCollectionFile(event) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        console.log(this.csvToArray(e.target.result))
-        /*try {
-          const data = JSON.parse(e.target.result);
-          console.log(data);
-          this.$store.commit("importCollection", data);
-        } catch (e) {
-          this.showToast(
-            "Error",
-            "Ha ocurrido un error al importar los datos",
-            "error"
-          );
-        }
-        this.showToast("Importado", "Colección importada con éxito", "success");*/
+        const data = this.csvToArray(e.target.result)
+        // Eliminar la cabecera
+        data.shift()
+        // 0: id
+        // 1: titulo
+        // 2: precio
+        // 3: tienda
+        // 4: imdblink
+        // 5: fecha añadida
+        // 6: estrenada (0 o 1)
+        const collection = data.map(m => ({
+          id: m[0],
+          title: m[1],
+          cost: m[2],
+          store: m[3],
+          imdbLink: m[4],
+          addDate: m[5],
+          watched: !!+m[6]
+        }))
+        this.$store.commit('importCollection', collection)
+        this.showToast("Importado", "Colección importada con éxito", "success");
       };
       reader.readAsText(event.target.files[0]);
     },
@@ -210,7 +218,7 @@ export default {
           }
           return movie;
         });
-        this.$store.commit("importCollection", data);
+        this.$store.commit("importCollection", data.movieCollection);
         this.showToast("Importado", "Colección importada con éxito", "success");
       } catch (e) {
         console.error(e);

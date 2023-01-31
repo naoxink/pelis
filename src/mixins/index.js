@@ -60,6 +60,7 @@ export default {
         header.join(','), // header row first
         ...items.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','))
       ].join('\r\n')
+      console.log(csv)
       return csv
     }
   }
