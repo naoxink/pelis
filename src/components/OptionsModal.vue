@@ -160,7 +160,7 @@ export default {
           cost: m[2],
           store: m[3],
           imdbLink: m[4],
-          addDate: m[5],
+          addDate: new Date(m[5]),
           watched: !!+m[6]
         }))
         this.$store.commit('importCollection', collection)
