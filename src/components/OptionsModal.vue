@@ -139,7 +139,8 @@ export default {
       const link = document.createElement("a");
       link.download = "pelis_export.csv";
       link.href = `data:text/csv;${this.jsonToCsv(this.movieCollection)}`;
-      link.click();
+      console.log(link.href)
+      // link.click();
     },
     importCollectionFile(event) {
       const reader = new FileReader();
