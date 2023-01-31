@@ -73,9 +73,9 @@ export default new Vuex.Store({
     },
     importCollection(state, data) {
       clearDB().then((e) => {
-        addToDB(data.movieCollection).then(e => {
-          state.movieCollection = data.movieCollection
-          state.totalSpent = data.totalSpent
+        addToDB(data).then(e => {
+          state.movieCollection = data
+          state.totalSpent = recalculateTotalSpent(state)
         })
       })
     },

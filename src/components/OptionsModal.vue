@@ -137,17 +137,15 @@ export default {
     downloadExportFile() {
       if (!this.exportCode) return false;
       const link = document.createElement("a");
-      link.download = "pelis_export.data";
-      link.href = `data:application/json;charset=utf-8;%EF%BB%BF;${JSON.stringify({
-        movieCollection: this.movieCollection,
-        totalSpent: this.totalSpent,
-      })}`;
+      link.download = "pelis_export.csv";
+      link.href = `data:text/csv;${this.jsonToCsv(this.movieCollection)}`;
       link.click();
     },
     importCollectionFile(event) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        try {
+        console.log(this.csvToArray(e.target.result))
+        /*try {
           const data = JSON.parse(e.target.result);
           console.log(data);
           this.$store.commit("importCollection", data);
@@ -158,7 +156,7 @@ export default {
             "error"
           );
         }
-        this.showToast("Importado", "Colección importada con éxito", "success");
+        this.showToast("Importado", "Colección importada con éxito", "success");*/
       };
       reader.readAsText(event.target.files[0]);
     },
