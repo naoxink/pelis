@@ -76,6 +76,9 @@
           <hr />
           <strong>Importar CSV de IMDB</strong>
           <input class="mt-2" type="file" @change="readFile" />
+          <strong>Importar desde archivo JSON</strong>
+          <input class="mt-2" type="file" @change="importJSONFile" />
+          <hr />
         </b-alert>
       </b-col>
     </b-row>
@@ -137,8 +140,14 @@ export default {
     downloadExportFile() {
       if (!this.exportCode) return false;
       const link = document.createElement("a");
-      link.download = "pelis_export.csv";
-      link.href = `data:text/csv;charset=utf-8,${this.jsonToCsv(this.movieCollection)}`;
+      const today = new Date()
+      const dateStr = [
+        today.getFullYear(),
+        today.getMonth() + 1,
+        today.getDate()
+      ].join('-')
+      link.download = `pelis_export_${dateStr}.csv`;
+      link.href = `data:text/csv;charset=utf-8,${this.jsonToCsv(this.movieCollection.map(this.formatMovie))}`;
       link.click();
     },
     importCollectionFile(event) {
@@ -147,26 +156,28 @@ export default {
         const data = this.csvToArray(e.target.result)
         // Eliminar la cabecera
         data.shift()
-        // 0: id
-        // 1: titulo
-        // 2: precio
-        // 3: tienda
-        // 4: imdblink
-        // 5: fecha añadida
-        // 6: estrenada (0 o 1)
         const collection = data.map(m => ({
-          id: m[0],
-          title: m[1],
-          cost: m[2],
-          store: m[3],
-          imdbLink: m[4],
-          addDate: new Date(m[5]),
-          watched: !!+m[6]
+          id: m[0] || this.newId(),
+          title: m[1] || '',
+          cost: m[2] || 0,
+          store: m[3] || '',
+          imdbLink: m[4] || '',
+          addDate: +m[5] || null,
+          watched: !!+m[6] || false
         }))
         this.$store.commit('importCollection', collection)
         this.showToast("Importado", "Colección importada con éxito", "success");
       };
       reader.readAsText(event.target.files[0]);
+    },
+    importJSONFile(event){
+      const file = event.target.files[0]
+      const fr = new FileReader()
+      fr.onload = () => {
+        const col = JSON.parse(fr.result)
+        this.$store.commit('importCollection', col.movieCollection)
+      };
+      fr.readAsText(file, 'UTF-8')
     },
     readFile: async function (event) {
       const file = event.target.files[0];
@@ -190,7 +201,7 @@ export default {
     },
     exportCollection() {
       const str = JSON.stringify({
-        movieCollection: this.movieCollection,
+        movieCollection: this.movieCollection.map(this.formatMovie),
         totalSpent: this.totalSpent,
       });
       this.exportCode = btoa(str);
@@ -214,7 +225,7 @@ export default {
           if (!movie.addDate) {
             movie.addDate = Date.now();
           } else {
-            movie.addDate = +movie.addDate;
+            movie.addDate = new Date(movie.addDate)
           }
           return movie;
         });

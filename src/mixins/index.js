@@ -1,5 +1,16 @@
 export default {
   methods: {
+    formatMovie(data){
+      return {
+        id: data.id || this.newId(),
+        title: data.title || '',
+        cost: data.cost || 0,
+        store: data.store || '',
+        imdbLink: data.imdbLink || '',
+        addDate: data.addDate || new Date(),
+        watched: data.watched || false
+      }
+    },
     showToast(title, text, variant){
       this.$bvToast.toast(text, {
         title,
