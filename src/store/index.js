@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import {
-  baseState,
+  DBBaseState,
   recalculateTotalSpent,
   random,
   isToday,
@@ -25,7 +25,7 @@ import {
 Vue.use(Vuex)
 
 export default new Vuex.Store({
-  state: baseState,
+  state: DBBaseState,
   mutations: {
     setCollection(state, collection) {
       state.movieCollection = collection

@@ -207,4 +207,4 @@ export const getFromLocalStorage = key => JSON.parse(window.localStorage.getItem
 
 export const setToLocalStorage = (key, data) => window.localStorage.setItem(key, JSON.stringify(data))
 
-export const baseState = baseState
+export const DBBaseState = baseState
