@@ -158,6 +158,7 @@ export default {
         data.shift()
         const collection = data.map(m => {
           const isTime = !m[5].includes('T')
+          console.log(m[5], isTime, isTime ? +m[5] : m[5], new Date(isTime ? +m[5] : m[5]))
           return {
             id: m[0] || this.newId(),
             title: m[1] || '',
