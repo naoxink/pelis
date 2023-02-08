@@ -164,7 +164,7 @@ export default {
             store: m[3] || '',
             imdbLink: m[4] || '',
             addDate: new Date(m[5]) || new Date(),
-            watched: Boolean(m[6])
+            watched: m[6] === 'true'
           }
         })
         this.$store.commit('importCollection', collection)
