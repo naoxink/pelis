@@ -157,6 +157,7 @@ export default {
         // Eliminar la cabecera
         data.shift()
         const collection = data.map(m => {
+          console.log(m[4], new Date(m[5]))
           return {
             id: m[0] || this.newId(),
             title: m[1] || '',
