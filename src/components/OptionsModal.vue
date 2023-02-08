@@ -156,15 +156,18 @@ export default {
         const data = this.csvToArray(e.target.result)
         // Eliminar la cabecera
         data.shift()
-        const collection = data.map(m => ({
-          id: m[0] || this.newId(),
-          title: m[1] || '',
-          cost: m[2] || 0,
-          store: m[3] || '',
-          imdbLink: m[4] || '',
-          addDate: +m[5] || null,
-          watched: !!+m[6] || false
-        }))
+        const collection = data.map(m => {
+          console.log(m[0], m[6], +m[6], !!+m[6])
+          return {
+            id: m[0] || this.newId(),
+            title: m[1] || '',
+            cost: m[2] || 0,
+            store: m[3] || '',
+            imdbLink: m[4] || '',
+            addDate: new Date(m[5]) || new Date(),
+            watched: !!+m[6] || false
+          }
+        })
         this.$store.commit('importCollection', collection)
         this.showToast("Importado", "Colección importada con éxito", "success");
       };
@@ -175,7 +178,12 @@ export default {
       const fr = new FileReader()
       fr.onload = () => {
         const col = JSON.parse(fr.result)
-        this.$store.commit('importCollection', col.movieCollection)
+        this.$store.commit('importCollection', col.movieCollection.map(m => {
+          if(m.title.includes('�')){
+            m.title = m.title.replace('�', '')
+          }
+          return m
+        }))
       };
       fr.readAsText(file, 'UTF-8')
     },

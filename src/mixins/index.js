@@ -65,7 +65,7 @@ export default {
     },
     jsonToCsv(json){
       const items = json
-      const replacer = (key, value) => value === null ? '' : value // specify how you want to handle null values here
+      const replacer = (key, value) => value === null ? '' : value.toString() // specify how you want to handle null values here
       const header = Object.keys(items[0])
       const csv = [
         header.join(','), // header row first
