@@ -157,14 +157,14 @@ export default {
         // Eliminar la cabecera
         data.shift()
         const collection = data.map(m => {
-          console.log(m[5], new Date(m[5]))
+          const isTime = !m[5].includes('T')
           return {
             id: m[0] || this.newId(),
             title: m[1] || '',
             cost: m[2] || 0,
             store: m[3] || '',
             imdbLink: m[4] || '',
-            addDate: new Date(m[5]) || new Date(),
+            addDate: new Date(isTime ? +m[5] : m[5]) || new Date(),
             watched: m[6] === 'true'
           }
         })
