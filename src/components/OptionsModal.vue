@@ -157,7 +157,6 @@ export default {
         // Eliminar la cabecera
         data.shift()
         const collection = data.map(m => {
-          console.log(m[0], m[6], +m[6], !!+m[6])
           return {
             id: m[0] || this.newId(),
             title: m[1] || '',
@@ -165,7 +164,7 @@ export default {
             store: m[3] || '',
             imdbLink: m[4] || '',
             addDate: new Date(m[5]) || new Date(),
-            watched: !!+m[6] || false
+            watched: Boolean(m[6])
           }
         })
         this.$store.commit('importCollection', collection)
