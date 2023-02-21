@@ -51,6 +51,18 @@
           </b-form-select>
         </b-input-group>
       </b-col>
+      <b-col>
+        <b-input-group prepend="Formato">
+          <b-form-select v-model="movie.format">
+            <b-form-select-option
+              v-for="(label, key) in formats"
+              :key="key"
+              :value="key"
+              >{{ label }}</b-form-select-option
+            >
+          </b-form-select>
+        </b-input-group>
+      </b-col>
     </b-row>
     <b-row>
       <b-col cols="12" class="mt-2">
@@ -81,7 +93,7 @@ export default {
   name: "DetailModal",
   props: ["movie"],
   computed: {
-    ...mapState(["stores"]),
+    ...mapState(["stores", "formats"]),
   },
 };
 </script>

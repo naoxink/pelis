@@ -516,6 +516,7 @@ export default {
         this.editMovieData.store = movie.store;
         this.editMovieData.imdbLink = movie.imdbLink;
         this.editMovieData.addDate = new Date(movie.addDate);
+        this.editMovieData.format = movie.format
       });
     },
     confirmEditMovie() {
@@ -523,10 +524,11 @@ export default {
         id: this.editMovieData.id,
         title: this.editMovieData.title,
         cost: +this.editMovieData.cost,
-        watched: +this.editMovieData.watched,
+        watched: +this.editMovieData.watched === 1,
         store: this.editMovieData.store,
         imdbLink: this.editMovieData.imdbLink,
-        addDate: this.editMovieData.addDate,
+        addDate: new Date(this.editMovieData.addDate),
+        format: this.editMovieData.format
       });
       this.showToast(
         "Editado",
@@ -539,6 +541,7 @@ export default {
       this.editMovieData.title = "";
       this.editMovieData.cost = "";
       this.editMovieData.store = "";
+      this.editMovieData.format = "";
     },
     showToast(title, text, variant) {
       this.$bvToast.toast(text, {

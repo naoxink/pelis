@@ -17,6 +17,10 @@ const baseState = {
     'selectavision': 'Selecta Visión',
     'mediamarkt': 'Mediamarkt',
     'game': 'Game'
+  },
+  formats: {
+    'br': 'Bluray',
+    'dvd': 'DVD'
   }
 }
 

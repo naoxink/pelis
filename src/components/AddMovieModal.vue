@@ -12,6 +12,12 @@
         <b-form-select-option v-for="(label, key) in stores" :key="key" :value="key">{{ label }}</b-form-select-option>
       </b-form-select>
     </b-input-group>
+    <b-input-group prepend="Formato" class="mt-2">
+      <b-form-select v-model="movie.format">
+        <b-form-select-option value=""></b-form-select-option>
+        <b-form-select-option v-for="(label, key) in formats" :key="key" :value="key">{{ label }}</b-form-select-option>
+      </b-form-select>
+    </b-input-group>
     <b-input-group size="md" prepend="IMDb link" class="mt-2">
       <b-form-input v-model="movie.imdbLink" @keyup.enter="addMovie"></b-form-input>
     </b-input-group>
@@ -30,7 +36,7 @@
     name: 'AddMovieModal',
     mixins: [ mixins ],
     computed: {
-      ...mapState([ 'stores' ])
+      ...mapState([ 'stores', 'formats' ])
     },
     data: function(){
       return {
@@ -38,7 +44,8 @@
           title: '',
           cost: 0,
           store: '',
-          imdbLink: ''
+          imdbLink: '',
+          format: ''
         }
       }
     },
@@ -51,7 +58,8 @@
           title: _.movie.title,
           cost: _.movie.cost,
           store: _.movie.store,
-          imdbLink: _.movie.imdbLink
+          imdbLink: _.movie.imdbLink,
+          format: _movie.format
         })
         document.querySelector('#new-movie-title-modal').focus()
         this.showToast('Añadida', `Se ha añadido "${this.movie.title}" a la colección con un coste de ${this.movie.cost}€`, 'success')
@@ -59,6 +67,7 @@
         this.movie.cost = 0
         this.movie.store = ''
         this.movie.imdbLink = ''
+        this.movie.format = ''
       },
     }
   }

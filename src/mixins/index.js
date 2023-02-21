@@ -8,7 +8,8 @@ export default {
         store: data.store || '',
         imdbLink: data.imdbLink || '',
         addDate: data.addDate || new Date(),
-        watched: data.watched || false
+        watched: (+data.watched === 1 || data.watched === true) || false,
+        format: data.format || 'br' // br o dvd
       }
     },
     showToast(title, text, variant){
@@ -34,15 +35,16 @@ export default {
         const imdbLink = movie[6]
         if(!id) return false
 
-        this.$store.commit('addMovie', {
+        this.$store.commit('addMovie', this.formatMovie({
           'id': id,
           'cost': 0,
           'store': '',
           'addDate': new Date(dateWatched).getTime(),
           'title': title,
           'watched': !!dateWatched,
-          'imdbLink': imdbLink
-        })
+          'imdbLink': imdbLink,
+          'format': 'br'
+        }))
       })
     },
     csvToArray(text) {
