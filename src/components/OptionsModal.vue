@@ -156,9 +156,8 @@ export default {
         const data = this.csvToArray(e.target.result)
         // Eliminar la cabecera
         data.shift()
-        const collection = data.map(m => {
+        const collection = data.filter(m => m.length > 5).map(m => {
           const isTime = !m[5].includes('T')
-          console.log(m[5], isTime, isTime ? +m[5] : m[5], new Date(isTime ? +m[5] : m[5]))
           return {
             id: m[0] || this.newId(),
             title: m[1] || '',
@@ -166,7 +165,8 @@ export default {
             store: m[3] || '',
             imdbLink: m[4] || '',
             addDate: new Date(isTime ? +m[5] : m[5]) || new Date(),
-            watched: m[6] === 'true'
+            watched: m[6] === 'true',
+            format: m[7] || 'br'
           }
         })
         this.$store.commit('importCollection', collection)
