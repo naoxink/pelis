@@ -59,7 +59,7 @@
           cost: _.movie.cost,
           store: _.movie.store,
           imdbLink: _.movie.imdbLink,
-          format: _movie.format
+          format: _.movie.format
         })
         document.querySelector('#new-movie-title-modal').focus()
         this.showToast('Añadida', `Se ha añadido "${this.movie.title}" a la colección con un coste de ${this.movie.cost}€`, 'success')
