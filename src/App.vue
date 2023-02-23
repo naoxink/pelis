@@ -310,7 +310,7 @@ export default {
         watched: null,
         sort: {
           field: "addDate",
-          order: -1,
+          order: 1,
         },
       },
       detailMovie: null,

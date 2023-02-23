@@ -131,8 +131,11 @@ export const getAllFromDB = () => new Promise((resolve, reject) => {
   const transaction = db.transaction(['collection'], 'readonly')
   const objStore = transaction.objectStore('collection')
   objStore.getAll().onsuccess = e => {
-    e.target.result.sort((a, b) => +a.addDate - +b.addDate)
-    resolve(e.target.result)
+    const results = e.target.result.map(m => {
+      m.addDate = new Date(m.addDate)
+      return m
+    })
+    resolve(results)
   }
 })
 
