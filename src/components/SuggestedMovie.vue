@@ -2,7 +2,7 @@
 	<b-card class="mb-3" v-if="movie.id">
    <b-card-text>
     <strong class="mr-1">Película sugerida hoy:</strong>
-    <a class="font-weight-bold" href="#" @click.prevent="$emit('showDetail', movie.id)">{{ movie.title }}</a>
+    <a class="font-weight-bold" href="#" @click.prevent="$emit('showDetail', movie)">{{ movie.title }}</a>
     <b-badge class="ml-1" v-if="!+movie.watched" variant="warning">SIN ESTRENAR</b-badge>
    </b-card-text>
   </b-card>
