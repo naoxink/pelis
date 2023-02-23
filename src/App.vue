@@ -139,6 +139,11 @@
                     <b-col cols="6" sm="8">
                       <div class="mt-1 text-left">
                         <b-badge
+                          v-if="movie.format"
+                          variant="info"
+                          class="mr-2 pl-2 pr-2"
+                        >{{ formats[movie.format] }}</b-badge>
+                        <b-badge
                           v-if="!+movie.watched"
                           variant="warning"
                           class="mr-2 pl-2 pr-2 text-uppercase"
@@ -149,12 +154,6 @@
                           class="mr-2 pl-2 pr-2"
                           :title="`Coste: ${movie.cost}€`"
                           >{{ movie.cost }}€</b-badge
-                        >
-                        <b-badge
-                          variant="secondary"
-                          class="mr-2 pl-2 pr-2"
-                          :title="`Añadida: ${formatDate(movie.addDate)}`"
-                          >{{ formatDate(movie.addDate) }}</b-badge
                         >
                       </div>
                     </b-col>
@@ -258,6 +257,7 @@ export default {
       "exportCode",
       "importCode",
       "showImportTextarea",
+      "formats"
     ]),
     hasAnyFilter() {
       return this.filters.title.length || this.filters.cost.length;
@@ -302,6 +302,7 @@ export default {
         store: "",
         imdbLink: "",
         addDate: null,
+        format: ''
       },
       showFilters: false,
       filters: {
@@ -312,6 +313,7 @@ export default {
           field: "addDate",
           order: 1,
         },
+        format: ''
       },
       detailMovie: null,
       filteredResults: {
