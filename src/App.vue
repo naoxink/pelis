@@ -12,19 +12,21 @@
             :totalMovies="totalMovies()"
             :giftMovies="giftMovies()"
             :unwatchedMovies="unwatchedMovies()"
+            :byFormat="countByFormat()"
           ></Resume>
 
-          <b-card>
-            <b-button variant="success" v-b-modal.add-movie-modal>
+          <div class="mb-3">
+            <b-button variant="success" block v-b-modal.add-movie-modal>
               <b-icon-plus></b-icon-plus> Añadir película</b-button>
-          </b-card>
+          </div>
+
+          <SuggestedMovie v-on:showDetail="showMovieModal"></SuggestedMovie>
+
         </b-col>
         <!-- Izquierda -->
 
         <b-col sm="12" lg="8">
           <!-- Derecha -->
-
-          <SuggestedMovie v-on:showDetail="showMovieModal"></SuggestedMovie>
 
           <b-pagination
             v-if="filteredResults.count"
@@ -359,6 +361,18 @@ export default {
         }
         return acc;
       }, 0);
+    },
+    countByFormat() {
+      const totals = {}
+      for(let id in this.movieCollection){
+        const movie = this.movieCollection[id]
+        if(!totals[movie.format]){
+          totals[movie.format] = 1
+        }else{
+          totals[movie.format]++
+        }
+      }
+      return totals
     },
     formatDate(date) {
       return new Date(date).toLocaleString().split(", ").shift();
