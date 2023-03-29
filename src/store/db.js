@@ -16,7 +16,8 @@ const baseState = {
     'carrefour': 'Carrefour',
     'selectavision': 'Selecta Visión',
     'mediamarkt': 'Mediamarkt',
-    'game': 'Game'
+    'game': 'Game',
+    'centromail': 'Centro Mail'
   },
   formats: {
     'br': 'Bluray',
