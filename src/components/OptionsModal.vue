@@ -1,7 +1,7 @@
 <template>
   <b-modal id="options-modal" title="Opciones" ok-only>
     <!-- Exportar colección -->
-    <b-row class="mb-3">
+    <b-row class="mb-1">
       <b-col>
         <b-alert variant="info" show>
           <h4>Exportación</h4>
@@ -20,6 +20,7 @@
           <b-button
             block
             variant="success"
+            class="mt-1 mb-1"
             v-if="exportCode"
             @click="downloadExportFile"
             >Descargar archivo</b-button
@@ -31,7 +32,7 @@
       </b-col>
     </b-row>
     <!-- Importar colección -->
-    <b-row class="mb-3">
+    <b-row class="mb-1">
       <b-col>
         <b-alert variant="warning" show>
           <h4>Importación</h4>
@@ -47,21 +48,33 @@
             v-if="showImportTextarea"
             v-model="importCode"
           ></b-textarea>
-          <b-button
-            variant="success"
-            class="mr-2"
-            v-if="importCode.length"
-            @click="importCollection"
-            >Importar colección</b-button
-          >
-          <b-button
-            v-if="showImportTextarea"
-            @click="
-              importCode = '';
-              showImportTextarea = false;
-            "
-            >Cancelar</b-button
-          >
+          <template v-if="showImportTextarea">
+            <b-button
+              block
+              variant="success"
+              class="mt-1 mb-1"
+              :disabled="!importCode.length"
+              @click="importCollection"
+              >Importar colección</b-button
+            >
+            <hr>
+            <div class="mt-1 mb-1">
+              <strong>Importar desde archivo</strong>
+              <input class="mt-2" type="file" @change="importCollectionFile" />
+            </div>
+            <div class="mt-1 mb-1">
+              <strong>Importar CSV de IMDB</strong>
+              <input class="mt-2" type="file" @change="readFile" />
+            </div>
+            <b-button
+              block
+              class="mt-2"
+              @click="
+                importCode = '';
+                showImportTextarea = false;
+              "
+              >Cerrar</b-button>
+          </template>
           <div class="text-center mt-2" v-if="importCode.length">
             <small
               ><strong
@@ -70,25 +83,22 @@
               ></small
             >
           </div>
-          <hr />
-          <strong>Importar desde archivo</strong>
-          <input class="mt-2" type="file" @change="importCollectionFile" />
-          <hr />
-          <strong>Importar CSV de IMDB</strong>
-          <input class="mt-2" type="file" @change="readFile" />
-          <strong>Importar desde archivo JSON</strong>
-          <input class="mt-2" type="file" @change="importJSONFile" />
-          <hr />
+          <!-- <strong>Importar desde archivo JSON</strong>
+          <input class="mt-2" type="file" @change="importJSONFile" /> -->
         </b-alert>
       </b-col>
     </b-row>
 
     <b-row>
       <b-col>
-        <b-alert variant="light" show>
-          <b-button variant="primary" @click="recalcTotalSpent"
-            >Recalcular coste total</b-button
-          >
+        <b-alert variant="secondary" show>
+          <b-row>
+            <b-col class="my-auto">Recalcular coste total de la colección</b-col>
+            <b-col cols="4">
+              <b-button block variant="primary" @click="recalcTotalSpent"
+                >Recalcular</b-button>
+            </b-col>
+          </b-row>
         </b-alert>
       </b-col>
     </b-row>
