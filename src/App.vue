@@ -55,9 +55,17 @@
             <!-- Filtros -->
             <b-list-group-item v-if="showFilters" variant="light">
               <b-row>
-                <b-col cols="12">
+                <b-col cols="12" md="6">
                   <b-input-group size="md" prepend="Título">
                     <b-form-input v-model="filters.title"></b-form-input>
+                  </b-input-group>
+                </b-col>
+                <b-col cols="12" md="6">
+                  <b-input-group prepend="Tienda">
+                    <b-form-select v-model="filters.store">
+                      <b-form-select-option value=""></b-form-select-option>
+                      <b-form-select-option v-for="(label, key) in stores" :key="key" :value="key">{{ label }}</b-form-select-option>
+                    </b-form-select>
                   </b-input-group>
                 </b-col>
               </b-row>
@@ -315,6 +323,7 @@ export default {
           field: "addDate",
           order: 1,
         },
+        store: '',
         format: ''
       },
       detailMovie: null,
@@ -421,6 +430,11 @@ export default {
       }
       if (this.filters.watched !== null) {
         if (+this.filters.watched !== +(item.watched || 0)) {
+          isOk = false;
+        }
+      }
+      if(this.filters.store){
+        if(item.store !== this.filters.store){
           isOk = false;
         }
       }
