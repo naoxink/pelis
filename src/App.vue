@@ -270,7 +270,7 @@ export default {
       "formats"
     ]),
     hasAnyFilter() {
-      return this.filters.title.length || this.filters.cost.length;
+      return this.filters.title.length || this.filters.cost.length || this.filters.store.length;
     },
   },
   watch: {
