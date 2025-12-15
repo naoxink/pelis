@@ -161,24 +161,22 @@ export const updateFromDB = (id, data) => new Promise((resolve, reject) => {
 })
 
 export const getAllFromDB = () => new Promise((resolve, reject) => {
-  getFromAPI().then(resolve).catch(reject)
-/*   const transaction = db.transaction(['collection'], 'readonly')
-  const objStore = transaction.objectStore('collection')
-  objStore.getAll().onsuccess = e => {
-    const results = e.target.result.map(m => {
+  getFromAPI().then(list => {
+    console.log('Obtenido de API: ', list)
+    list = list.map(m => {
       m.addDate = new Date(m.addDate)
       return m
     })
-    resolve(results)
-  } */
+    resolve(list)
+  }).catch(reject)
 })
 
 export const clearDB = () => new Promise((resolve, reject) => {
-  const transaction = db.transaction(['collection'], 'readwrite')
+  /* const transaction = db.transaction(['collection'], 'readwrite')
   const objStore = transaction.objectStore('collection')
   objStore.clear().onsuccess = e => {
     resolve(e)
-  }
+  } */
 })
 
 ////////////////////////
