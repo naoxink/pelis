@@ -31,7 +31,6 @@ const baseState = {
 }
 
 const init = function (e) {
-  db = e.target.result
   getAllFromDB().then((collection) => {
     baseState.movieCollection = collection
     // No pelis, no party
