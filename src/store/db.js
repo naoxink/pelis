@@ -93,8 +93,10 @@ export const isToday = time => {
 }
 
 export const addToDB = data => new Promise((resolve, reject) => {
-  addToAPI(data) // TEST
-  const transaction = db.transaction(['collection'], 'readwrite')
+  addToAPI(data)
+  .then(resolve)
+  .catch(reject)
+/*   const transaction = db.transaction(['collection'], 'readwrite')
   const objStore = transaction.objectStore('collection')
   if (Array.isArray(data)) {
     data.forEach(item => objStore.add(item))
@@ -102,17 +104,29 @@ export const addToDB = data => new Promise((resolve, reject) => {
     objStore.add(data)
   }
   transaction.onerror = e => reject(e)
-  transaction.oncomplete = e => resolve(true)
+  transaction.oncomplete = e => resolve(true) */
 })
 
 export const addToAPI = async data => {
-  console.log('Llamando API..')
-  const API_BASE_URL = 'https://pelis-api-hazel.vercel.app/api';
-
   const nuevaPelicula = data;
-
   const response = await fetch(`${API_BASE_URL}/movies`, {
       method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(nuevaPelicula)
+  })
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+  response = await response.json();
+  return response;
+}
+
+export const getFromAPI = async () => {
+  const nuevaPelicula = data;
+  const response = await fetch(`${API_BASE_URL}/movies`, {
+      method: 'GET',
       headers: {
           'Content-Type': 'application/json'
       },
@@ -150,7 +164,8 @@ export const updateFromDB = (id, data) => new Promise((resolve, reject) => {
 })
 
 export const getAllFromDB = () => new Promise((resolve, reject) => {
-  const transaction = db.transaction(['collection'], 'readonly')
+  getFromAPI().then(resolve).catch(reject)
+/*   const transaction = db.transaction(['collection'], 'readonly')
   const objStore = transaction.objectStore('collection')
   objStore.getAll().onsuccess = e => {
     const results = e.target.result.map(m => {
@@ -158,7 +173,7 @@ export const getAllFromDB = () => new Promise((resolve, reject) => {
       return m
     })
     resolve(results)
-  }
+  } */
 })
 
 export const clearDB = () => new Promise((resolve, reject) => {
