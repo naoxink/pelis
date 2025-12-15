@@ -93,15 +93,36 @@ export const isToday = time => {
 }
 
 export const addToDB = data => new Promise((resolve, reject) => {
-  const transaction = db.transaction(['collection'], 'readwrite')
-  const objStore = transaction.objectStore('collection')
-  if (Array.isArray(data)) {
-    data.forEach(item => objStore.add(item))
-  } else {
-    objStore.add(data)
-  }
-  transaction.onerror = e => reject(e)
-  transaction.oncomplete = e => resolve(true)
+
+  const API_BASE_URL = 'https://<tu-dominio>.vercel.app/api';
+
+  const nuevaPelicula = data;
+
+  fetch(`${API_BASE_URL}/movies`, {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(nuevaPelicula)
+  })
+  .then(response => {
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+  })
+  .then(data => resolve(true))
+  .catch(error => reject(error));
+
+  // const transaction = db.transaction(['collection'], 'readwrite')
+  // const objStore = transaction.objectStore('collection')
+  // if (Array.isArray(data)) {
+  //   data.forEach(item => objStore.add(item))
+  // } else {
+  //   objStore.add(data)
+  // }
+  // transaction.onerror = e => reject(e)
+  // transaction.oncomplete = e => resolve(true)
 })
 
 export const getFromDB = id => new Promise((resolve, reject) => {
