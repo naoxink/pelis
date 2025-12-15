@@ -133,8 +133,7 @@ export const getFromAPI = async () => {
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`)
   }
-  response = await response.json();
-  return response;
+  return await response.json();
 }
 
 export const getFromDB = id => new Promise((resolve, reject) => {
