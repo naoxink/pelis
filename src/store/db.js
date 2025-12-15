@@ -51,8 +51,10 @@ requestDB.onsuccess = function (e) {
     baseState.totalSpent = recalculateTotalSpent(baseState)
     // Miramos si la que hay guardada en el localStorage es la sugerida de hoy
     const suggestedFromLocal = getFromLocalStorage('config.suggestedToday')
+    console.log(suggestedFromLocal)
     if (suggestedFromLocal && isToday(suggestedFromLocal.date)) {
       getFromDB(suggestedFromLocal.id).then(item => {
+        console.log(item)
         if (item) {
           baseState.suggestedToday = {
             date: item.date,
@@ -63,6 +65,8 @@ requestDB.onsuccess = function (e) {
             date: Date.now(),
             id: collection[random(0, collection.length - 1)].id
           }
+          console.log(suggestedTodayNew)
+          console.log(collection)
           baseState.suggestedToday = suggestedTodayNew
           setToLocalStorage('config.suggestedToday', suggestedTodayNew)
         }
