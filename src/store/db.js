@@ -41,7 +41,20 @@ const init = function (e) {
     // Miramos si la que hay guardada en el localStorage es la sugerida de hoy
     const suggestedFromLocal = getFromLocalStorage('config.suggestedToday')
 
-    if (suggestedFromLocal && isToday(suggestedFromLocal.date)) {
+    if (suggestedFromLocal && suggestedFromLocal.id && isToday(suggestedFromLocal.date)) {
+
+      // Antes de pedir detalle a la API vamos a comprobar que existe en la colección
+      if (!collection.some(movie => movie.id === suggestedFromLocal.id)) {
+        // Si no existe generamos una nueva
+        const suggestedTodayNew = {
+          date: Date.now(),
+          id: collection[random(0, collection.length - 1)].id
+        }
+        baseState.suggestedToday = suggestedTodayNew
+        setToLocalStorage('config.suggestedToday', suggestedTodayNew)
+        return;
+      }
+
       getFromDB(suggestedFromLocal.id).then(item => {
         if (item) {
           baseState.suggestedToday = {
