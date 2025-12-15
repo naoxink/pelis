@@ -3,22 +3,11 @@ import Vuex from 'vuex'
 import {
   DBBaseState,
   recalculateTotalSpent,
-  random,
-  isToday,
   addToDB,
   getFromDB,
   removeFromDB,
   updateFromDB,
-  getAllFromDB,
   clearDB,
-  getList,
-  createList,
-  editList,
-  deleteList,
-  addMovieToList,
-  deleteMovieFromList,
-  getFromLocalStorage,
-  setToLocalStorage
 } from './db.js'
 
 
@@ -34,9 +23,9 @@ export default new Vuex.Store({
       if (!data.addDate) {
         data.addDate = Date.now()
       }
-      addToDB(data).then(() => {
-        state.movieCollection.push(data)
-        state.totalSpent += +data.cost
+      addToDB(data).then((addedItem) => {
+        state.movieCollection.push(addedItem)
+        state.totalSpent += +addedItem.cost
       })
     },
     clearCollection(state) {
