@@ -55,20 +55,30 @@ const init = function (e) {
         return;
       }
 
-      getFromDB(suggestedFromLocal.id).then(item => {
-        if (item) {
-          baseState.suggestedToday = {
-            date: item.date,
-            id: item.id
+      getFromDB(suggestedFromLocal.id)
+        .then(item => {
+          if (item) {
+            baseState.suggestedToday = {
+              date: item.date,
+              id: item.id
+            }
+          } else {
+            const suggestedTodayNew = {
+              date: Date.now(),
+              id: collection[random(0, collection.length - 1)].id
+            }
+            baseState.suggestedToday = suggestedTodayNew
+            setToLocalStorage('config.suggestedToday', suggestedTodayNew)
           }
-        } else {
-          const suggestedTodayNew = {
-            date: Date.now(),
-            id: collection[random(0, collection.length - 1)].id
-          }
-          baseState.suggestedToday = suggestedTodayNew
-          setToLocalStorage('config.suggestedToday', suggestedTodayNew)
         }
+      )
+      .catch(e => {
+        const suggestedTodayNew = {
+          date: Date.now(),
+          id: collection[random(0, collection.length - 1)].id
+        }
+        baseState.suggestedToday = suggestedTodayNew
+        setToLocalStorage('config.suggestedToday', suggestedTodayNew)
       })
 
     } else {
