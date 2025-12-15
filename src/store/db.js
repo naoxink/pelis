@@ -93,8 +93,8 @@ export const isToday = time => {
 }
 
 export const addToDB = data => new Promise((resolve, reject) => {
-
-  const API_BASE_URL = 'https://<tu-dominio>.vercel.app/api';
+  console.log('Llamando API..')
+  const API_BASE_URL = 'https://pelis-api-hazel.vercel.app/api';
 
   const nuevaPelicula = data;
 
