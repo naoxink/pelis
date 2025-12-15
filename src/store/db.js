@@ -1,6 +1,10 @@
 const requestDB = window.indexedDB.open('pelisDB', 1)
 const API_BASE_URL = 'https://pelis-api-hazel.vercel.app/api';
 let db = null
+import {
+  addToAPI,
+  getFromAPI
+} from './dbAPI.js'
 
 const baseState = {
   movieCollection: {},
@@ -108,34 +112,6 @@ export const addToDB = data => new Promise((resolve, reject) => {
   transaction.oncomplete = e => resolve(true) */
 })
 
-export const addToAPI = async data => {
-  const nuevaPelicula = data;
-  const response = await fetch(`${API_BASE_URL}/movies`, {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(nuevaPelicula)
-  })
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`)
-  }
-  return await response.json();
-}
-
-export const getFromAPI = async () => {
-  const response = await fetch(`${API_BASE_URL}/movies`, {
-      method: 'GET',
-      headers: {
-          'Content-Type': 'application/json'
-      }
-  })
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`)
-  }
-  return await response.json();
-}
-
 export const getFromDB = id => new Promise((resolve, reject) => {
   const transaction = db.transaction(['collection'], 'readonly')
   const objStore = transaction.objectStore('collection')
@@ -161,6 +137,7 @@ export const updateFromDB = (id, data) => new Promise((resolve, reject) => {
 })
 
 export const getAllFromDB = () => new Promise((resolve, reject) => {
+  console.log('Obteniendo de API..')
   getFromAPI().then(list => {
     console.log('Obtenido de API: ', list)
     list = list.map(m => {
