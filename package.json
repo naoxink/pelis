@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "build-docs": "vue-cli-service build && mv dist docs"
+    "build-docs": "rm -rf docs && vue-cli-service build && mv dist docs"
   },
   "dependencies": {
     "bootstrap": "^4.5.3",
