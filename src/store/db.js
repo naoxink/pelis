@@ -1,5 +1,4 @@
 const requestDB = window.indexedDB.open('pelisDB', 1)
-const API_BASE_URL = 'https://pelis-api-hazel.vercel.app/api';
 let db = null
 import {
   addToAPI,

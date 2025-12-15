@@ -1,3 +1,5 @@
+const API_BASE_URL = 'https://pelis-api-hazel.vercel.app/api';
+
 export const addToAPI = async data => {
   const nuevaPelicula = data;
   const response = await fetch(`${API_BASE_URL}/movies`, {
@@ -15,6 +17,19 @@ export const addToAPI = async data => {
 
 export const getFromAPI = async () => {
   const response = await fetch(`${API_BASE_URL}/movies`, {
+      method: 'GET',
+      headers: {
+          'Content-Type': 'application/json'
+      }
+  })
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+  return await response.json();
+}
+
+export const getDetailFromAPI = async id => {
+  const response = await fetch(`${API_BASE_URL}/movies/${id}`, {
       method: 'GET',
       headers: {
           'Content-Type': 'application/json'
