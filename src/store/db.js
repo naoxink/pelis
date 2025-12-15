@@ -2,6 +2,7 @@ const requestDB = window.indexedDB.open('pelisDB', 1)
 let db = null
 import {
   addToAPI,
+  getDetailFromAPI,
   getFromAPI
 } from './dbAPI.js'
 
@@ -116,9 +117,9 @@ export const addToDB = data => new Promise((resolve, reject) => {
 })
 
 export const getFromDB = id => new Promise((resolve, reject) => {
-  const transaction = db.transaction(['collection'], 'readonly')
-  const objStore = transaction.objectStore('collection')
-  objStore.get(id).onsuccess = e => resolve(e.target.result)
+  getDetailFromAPI(id)
+  .then(resolve)
+  .catch(reject)
 })
 
 export const removeFromDB = id => new Promise((resolve, reject) => {
