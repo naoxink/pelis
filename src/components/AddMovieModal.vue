@@ -54,12 +54,11 @@
         const _ = this
         if(!this.movie.title) return false
         this.$store.commit('addMovie', {
-          id: _.newId(),
           title: _.movie.title,
           cost: _.movie.cost,
           store: _.movie.store,
           imdbLink: _.movie.imdbLink,
-          format: _.movie.format
+          format: _.movie.format || 'br'
         })
         document.querySelector('#new-movie-title-modal').focus()
         this.showToast('Añadida', `Se ha añadido "${this.movie.title}" a la colección con un coste de ${this.movie.cost}€`, 'success')

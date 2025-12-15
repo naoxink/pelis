@@ -1,4 +1,5 @@
-const API_BASE_URL = 'https://pelis-api-hazel.vercel.app/api';
+const API_BASE_URL = 'https://pelis-api-hazel.vercel.app/api'
+
 const API_REQUEST_HEADERS = {
     'Content-Type': 'application/json'
 }
@@ -13,7 +14,7 @@ export const addToAPI = async data => {
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`)
   }
-  return await response.json();
+  return await response.json()
 }
 
 export const getFromAPI = async () => {
@@ -46,7 +47,7 @@ export const removeFromAPI = async id => {
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`)
   }
-  return await response.json();
+  return response.status === 204
 }
 
 export const updateInAPI = async (id, data) => {
@@ -59,5 +60,16 @@ export const updateInAPI = async (id, data) => {
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`)
   }
-  return await response.json();
+  return response.status === 200
+}
+
+export const clearCollectionInAPI = async () => {
+  const response = await fetch(`${API_BASE_URL}/movies/`, {
+      method: 'DELETE',
+      headers: API_REQUEST_HEADERS
+  })
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+  return response.status === 200
 }

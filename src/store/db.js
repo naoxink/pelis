@@ -3,7 +3,8 @@ import {
   getDetailFromAPI,
   getFromAPI,
   removeFromAPI,
-  updateInAPI
+  updateInAPI,
+  clearCollectionInAPI
 } from './dbAPI.js'
 
 const baseState = {
@@ -87,9 +88,20 @@ export const isToday = time => {
 }
 
 export const addToDB = data => new Promise((resolve, reject) => {
-  addToAPI(data)
-  .then(resolve)
-  .catch(reject)
+  if (Array.isArray(data)) {
+    data.forEach(async (item) => {
+      try {
+        await addToAPI(item)
+      } catch(error) {
+        reject(error)
+      }
+    })
+    resolve(data)
+  } else {
+    addToAPI(data)
+      .then(resolve)
+      .catch(reject)
+  }
 })
 
 export const getFromDB = id => new Promise((resolve, reject) => {
@@ -121,11 +133,9 @@ export const getAllFromDB = () => new Promise((resolve, reject) => {
 })
 
 export const clearDB = () => new Promise((resolve, reject) => {
-  /* const transaction = db.transaction(['collection'], 'readwrite')
-  const objStore = transaction.objectStore('collection')
-  objStore.clear().onsuccess = e => {
-    resolve(e)
-  } */
+  clearCollectionInAPI()
+  .then(resolve)
+  .catch(reject)
 })
 
 ////////////////////////

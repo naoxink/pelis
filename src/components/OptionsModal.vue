@@ -169,7 +169,7 @@ export default {
         const collection = data.filter(m => m.length > 5).map(m => {
           const isTime = !m[5].includes('T')
           return {
-            id: m[0] || this.newId(),
+            id: m[0],
             title: m[1] || '',
             cost: m[2] || 0,
             store: m[3] || '',
@@ -233,9 +233,6 @@ export default {
       try {
         const data = JSON.parse(str);
         data.movieCollection = data.movieCollection.map((movie) => {
-          if (!movie.id) {
-            movie.id = this.newId();
-          }
           if (typeof movie.watched === "undefined") {
             movie.watched = 1;
           } else {

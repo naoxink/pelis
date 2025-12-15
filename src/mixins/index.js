@@ -2,7 +2,7 @@ export default {
     methods: {
         formatMovie(data) {
             return {
-                id: data.id || this.newId(),
+                id: data.id || '',
                 title: data.title || '',
                 cost: data.cost || 0,
                 store: data.store || '',
@@ -19,9 +19,6 @@ export default {
                 solid: true,
                 toaster: 'b-toaster-top-center'
             })
-        },
-        newId() {
-            return Math.random().toString().substring(2) + new Date().getTime()
         },
         readImdbCSV: async function(fileData) {
             const parsed = this.csvToArray(fileData)

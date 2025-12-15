@@ -456,14 +456,10 @@ export default {
         return +item.cost === +this.filters.cost;
       }
     },
-    newId() {
-      return Math.random().toString().substring(2) + new Date().getTime();
-    },
     addMovie() {
       const _ = this;
       if (!this.addMovieData.title) return false;
       this.$store.commit("addMovie", {
-        id: _.newId(),
         title: _.addMovieData.title,
         cost: _.addMovieData.cost,
         store: _.addMovieData.store,
@@ -516,9 +512,6 @@ export default {
       try {
         const data = JSON.parse(str);
         data.movieCollection = data.movieCollection.map((movie) => {
-          if (!movie.id) {
-            movie.id = this.newId();
-          }
           if (typeof movie.watched === "undefined") {
             movie.watched = 1;
           } else {
