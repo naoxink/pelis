@@ -120,8 +120,7 @@ export const addToAPI = async data => {
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`)
   }
-  response = await response.json();
-  return response;
+  return await response.json();
 }
 
 export const getFromAPI = async () => {
