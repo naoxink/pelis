@@ -1,9 +1,9 @@
-const requestDB = window.indexedDB.open('pelisDB', 1)
-let db = null
 import {
   addToAPI,
   getDetailFromAPI,
-  getFromAPI
+  getFromAPI,
+  removeFromAPI,
+  updateInAPI
 } from './dbAPI.js'
 
 const baseState = {
@@ -30,19 +30,7 @@ const baseState = {
   }
 }
 
-requestDB.onerror = function (e) {
-  throw new Error(e.target.errorCode)
-}
-
-requestDB.onupgradeneeded = function (e) {
-  db = e.target.result
-  const objStore = db.createObjectStore('collection', { keyPath: 'id' })
-  objStore.createIndex('id', 'id', { unique: true })
-  const objStorelists = db.createObjectStore('lists', { keyPath: 'id' })
-  objStorelists.createIndex('id', 'id', { unique: true })
-}
-
-requestDB.onsuccess = function (e) {
+const init = function (e) {
   db = e.target.result
   getAllFromDB().then((collection) => {
     baseState.movieCollection = collection
@@ -52,10 +40,9 @@ requestDB.onsuccess = function (e) {
     baseState.totalSpent = recalculateTotalSpent(baseState)
     // Miramos si la que hay guardada en el localStorage es la sugerida de hoy
     const suggestedFromLocal = getFromLocalStorage('config.suggestedToday')
-    console.log(suggestedFromLocal)
+
     if (suggestedFromLocal && isToday(suggestedFromLocal.date)) {
       getFromDB(suggestedFromLocal.id).then(item => {
-        console.log(item)
         if (item) {
           baseState.suggestedToday = {
             date: item.date,
@@ -66,8 +53,6 @@ requestDB.onsuccess = function (e) {
             date: Date.now(),
             id: collection[random(0, collection.length - 1)].id
           }
-          console.log(suggestedTodayNew)
-          console.log(collection)
           baseState.suggestedToday = suggestedTodayNew
           setToLocalStorage('config.suggestedToday', suggestedTodayNew)
         }
@@ -81,8 +66,11 @@ requestDB.onsuccess = function (e) {
       baseState.suggestedToday = suggestedTodayNew
       setToLocalStorage('config.suggestedToday', suggestedTodayNew)
     }
+
   })
 }
+
+init();
 
 export const recalculateTotalSpent = state => {
   return state.movieCollection.reduce((acc, item) => {
@@ -105,15 +93,6 @@ export const addToDB = data => new Promise((resolve, reject) => {
   addToAPI(data)
   .then(resolve)
   .catch(reject)
-/*   const transaction = db.transaction(['collection'], 'readwrite')
-  const objStore = transaction.objectStore('collection')
-  if (Array.isArray(data)) {
-    data.forEach(item => objStore.add(item))
-  } else {
-    objStore.add(data)
-  }
-  transaction.onerror = e => reject(e)
-  transaction.oncomplete = e => resolve(true) */
 })
 
 export const getFromDB = id => new Promise((resolve, reject) => {
@@ -123,27 +102,19 @@ export const getFromDB = id => new Promise((resolve, reject) => {
 })
 
 export const removeFromDB = id => new Promise((resolve, reject) => {
-  const transaction = db.transaction(['collection'], 'readwrite')
-  const objStore = transaction.objectStore('collection')
-  objStore.delete(id).onsuccess = e => resolve(e)
+  removeFromAPI(id)
+  .then(resolve)
+  .catch(reject)
 })
 
 export const updateFromDB = (id, data) => new Promise((resolve, reject) => {
-  const transaction = db.transaction(['collection'], 'readwrite')
-  const objStore = transaction.objectStore('collection')
-  objStore.get(id).onsuccess = e => {
-    const item = e.target.result
-    const updatedData = Object.assign({}, item, data)
-    objStore.put(updatedData).onsuccess = e => {
-      getFromDB(updatedData.id).then(e => resolve(e))
-    }
-  }
+  updateInAPI(id, data)
+  .then(resolve)
+  .catch(reject)
 })
 
 export const getAllFromDB = () => new Promise((resolve, reject) => {
-  console.log('Obteniendo de API..')
   getFromAPI().then(list => {
-    console.log('Obtenido de API: ', list)
     list = list.map(m => {
       m.addDate = new Date(m.addDate)
       return m
