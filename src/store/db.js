@@ -69,8 +69,6 @@ const init = function (e) {
   }).catch(console.error)
 }
 
-init();
-
 export const recalculateTotalSpent = state => {
   return state.movieCollection.reduce((acc, item) => {
     acc += +item.cost
@@ -198,3 +196,5 @@ export const getFromLocalStorage = key => JSON.parse(window.localStorage.getItem
 export const setToLocalStorage = (key, data) => window.localStorage.setItem(key, JSON.stringify(data))
 
 export const DBBaseState = baseState
+
+init();
