@@ -352,7 +352,7 @@ export default {
       // });
     },
     totalMovies() {
-      return this.movieCollection.length;
+      return Array.isArray(this.movieCollection) ? this.movieCollection.length : 0;
     },
     giftMovies() {
       let total = 0;
