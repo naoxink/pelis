@@ -66,7 +66,7 @@ const init = function (e) {
       setToLocalStorage('config.suggestedToday', suggestedTodayNew)
     }
 
-  })
+  }).catch(console.error)
 }
 
 init();
@@ -133,7 +133,7 @@ export const clearDB = () => new Promise((resolve, reject) => {
 ////////////////////////
 // vvv  LISTAS  vvv   //
 ////////////////////////
-export const getList = (listId) => new Promise((resolve, reject) => {
+/* export const getList = (listId) => new Promise((resolve, reject) => {
   const objStore = db.transaction(['lists'], 'readonly').objectStore('lists')
   objStore.get(listId).onsuccess = e => resolve(e.target.result)
 })
@@ -188,7 +188,7 @@ export const deleteMovieFromList = (listId, movie) => new Promise((resolve, reje
     listData.movies = listData.movies.filter(mid => mid !== movie.id)
     objStore.put(listData).onsuccess = e => resolve(listData)
   } // Fin get
-})
+}) */
 ////////////////////////
 // ^^^  LISTAS  ^^^   //
 ////////////////////////
