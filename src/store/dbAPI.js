@@ -36,7 +36,7 @@ export const clearCollectionInAPI = async () => {
 }
 
 export const callAPI = async (method, path, data = {}) => {
-  if (!window.auth || !localStorage.getItem('ak')) {
+  if (!localStorage.getItem('ak')) {
     throw new Error('Error! Invalid auth.')
   }
   const response = await fetch(`${API_BASE_URL}${path}`, {

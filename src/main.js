@@ -40,12 +40,8 @@ const HASHED_STRING = '5105d8f593cc9aa310d7d9052f26cb7b069233328b7eeaae5cb82dc90
         // 4. Calcular el hash de forma ASÍNCRONA
         const hashed = await hashString(psst, 'SHA-256'); // Asegúrate de usar el mismo algoritmo que generó HASHED_STRING
 
-        console.log('Hash generado:', hashed);
-        console.log('Hash esperado:', HASHED_STRING);
-
         // 5. Comprobar la coincidencia
         if (hashed === HASHED_STRING) {
-            window.auth = true;
             localStorage.setItem('ak', HASHED_STRING);
             console.log('¡Autenticación exitosa!');
         } else {
