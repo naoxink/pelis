@@ -25,9 +25,11 @@ Vue.use(IconsPlugin)
 
 const HASHED_STRING = '5105d8f593cc9aa310d7d9052f26cb7b069233328b7eeaae5cb82dc904b94fa2'
 if (!window.auth && !localStorage.getItem('ak')) {
-  const psst = prompt('psst!')
+  const psst = window.prompt('psst!')
   (async () => {
-    if (await hashString(psst) === HASHED_STRING) {
+    const hashed = await hashString(psst)
+    console.log(hashed, HASHED_STRING)
+    if (hashed === HASHED_STRING) {
       window.auth = true
       localStorage.setItem('ak', HASHED_STRING)
     }
