@@ -35,15 +35,20 @@ export const clearCollectionInAPI = async () => {
   return response.status === 200
 }
 
-export const callAPI = async (method, path, data = {}) => {
+export const callAPI = async (method, path, data) => {
   if (!localStorage.getItem('ak')) {
     throw new Error('Error! Invalid auth.')
   }
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-      method,
-      headers: API_REQUEST_HEADERS,
-      body: JSON.stringify(data)
-  })
+
+  const payload = {
+    method,
+    headers: API_REQUEST_HEADERS
+  }
+
+  if (data) {
+    payload.body = JSON.stringify(data)
+  }
+  const response = await fetch(`${API_BASE_URL}${path}`, payload)
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`)
   }
