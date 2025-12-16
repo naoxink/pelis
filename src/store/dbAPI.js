@@ -5,71 +5,44 @@ const API_REQUEST_HEADERS = {
 }
 
 export const addToAPI = async data => {
-  const nuevaPelicula = data;
-  const response = await fetch(`${API_BASE_URL}/movies`, {
-      method: 'POST',
-      headers: API_REQUEST_HEADERS,
-      body: JSON.stringify(nuevaPelicula)
-  })
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`)
-  }
+  const response = await callAPI('POST', '/movies', data)
   return await response.json()
 }
 
 export const getFromAPI = async () => {
-  const response = await fetch(`${API_BASE_URL}/movies`, {
-      method: 'GET',
-      headers: API_REQUEST_HEADERS
-  })
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`)
-  }
+  const response = await callAPI('GET', '/movies')
   return await response.json();
 }
 
 export const getDetailFromAPI = async id => {
-  const response = await fetch(`${API_BASE_URL}/movies/${id}`, {
-      method: 'GET',
-      headers: API_REQUEST_HEADERS
-  })
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`)
-  }
+  const response = await callAPI('GET', `/movies/${id}`)
   return await response.json();
 }
 
 export const removeFromAPI = async id => {
-  const response = await fetch(`${API_BASE_URL}/movies/${id}`, {
-      method: 'DELETE',
-      headers: API_REQUEST_HEADERS
-  })
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`)
-  }
+  const response = await callAPI('DELETE', `/movies/${id}`)
   return response.status === 204
 }
 
 export const updateInAPI = async (id, data) => {
   if (data.id) delete data.id;
-  const response = await fetch(`${API_BASE_URL}/movies/${id}`, {
-      method: 'PUT',
+  const response = await callAPI('PUT', `/movies/${id}`, data)
+  return response.status === 200
+}
+
+export const clearCollectionInAPI = async () => {
+  const response = await callAPI('DELETE', '/movies/')
+  return response.status === 200
+}
+
+export const callAPI = async (method, path, data = {}) => {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+      method,
       headers: API_REQUEST_HEADERS,
       body: JSON.stringify(data)
   })
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`)
   }
-  return response.status === 200
-}
-
-export const clearCollectionInAPI = async () => {
-  const response = await fetch(`${API_BASE_URL}/movies/`, {
-      method: 'DELETE',
-      headers: API_REQUEST_HEADERS
-  })
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`)
-  }
-  return response.status === 200
+  return response
 }
