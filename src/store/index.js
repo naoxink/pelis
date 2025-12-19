@@ -20,13 +20,30 @@ export default new Vuex.Store({
       state.movieCollection = collection
     },
     addMovie: async (state, data) => {
-      if (!data.addDate) {
-        data.addDate = Date.now()
-      }
-      addToDB(data).then((addedItem) => {
-        state.movieCollection.push(addedItem)
-        state.totalSpent += +addedItem.cost
-      })
+      // 1. Normalizamos la entrada: nos aseguramos de que data sea un array para procesarlo igual
+      const itemsToAdd = Array.isArray(data) ? data : [data];
+
+      // 2. Añadimos la fecha por defecto a cada película si no la tiene
+      itemsToAdd.forEach(item => {
+        if (!item.addDate) {
+          item.addDate = Date.now();
+        }
+      });
+
+      // 3. Enviamos a la DB (si data era array, enviamos array; si no, el objeto)
+      // Nota: Si addToDB no maneja arrays, pásale 'itemsToAdd' directamente
+      addToDB(data).then((response) => {
+        // 4. Normalizamos la respuesta del servidor
+        // El backend ahora puede devolver un objeto o un array de objetos guardados
+        const addedItems = Array.isArray(response) ? response : [response];
+
+        addedItems.forEach((addedItem) => {
+          state.movieCollection.push(addedItem);
+          state.totalSpent += +addedItem.cost;
+        });
+      }).catch(error => {
+        console.error("Error al añadir película(s):", error);
+      });
     },
     clearCollection(state) {
       clearDB().then(() => {

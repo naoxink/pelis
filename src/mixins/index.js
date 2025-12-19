@@ -73,26 +73,39 @@ export default {
         },
         readImdbCSV: async function(fileData) {
             const parsed = this.csvToArray(fileData)
-            parsed.forEach(async(movie, index) => {
-                if (index === 0) {
-                    return false
-                }
-                const dateWatched = movie[17]
-                const title = movie[5]
-                const imdbLink = movie[7]
-                const tiendaYPrecio = this.obtenerTiendaYPrecioDeDescripcionImdb(movie[4] || '')
-                const dateAdded = movie[2]
+            // Eliminamos el encabezado (index 0)
+            const rows = parsed.slice(1)
+            
+            const batchSize = 100
+            
+            // Iteramos por bloques de 100
+            for (let i = 0; i < rows.length; i += batchSize) {
+                // Extraemos el grupo actual
+                const chunk = rows.slice(i, i + batchSize)
+                
+                // Mapeamos cada fila al formato que espera tu API
+                const moviesBatch = chunk.map(movie => {
+                    const dateWatched = movie[17]
+                    const title = movie[5]
+                    const imdbLink = movie[7]
+                    const tiendaYPrecio = this.obtenerTiendaYPrecioDeDescripcionImdb(movie[4] || '')
+                    const dateAdded = movie[2]
 
-                this.$store.commit('addMovie', this.formatMovie({
-                    'cost': tiendaYPrecio.precio,
-                    'store': tiendaYPrecio.tienda,
-                    'addDate': new Date(dateAdded).getTime(),
-                    'title': title,
-                    'watched': !!dateWatched,
-                    'imdbLink': imdbLink,
-                    'format': 'br'
-                }))
-            })
+                    return this.formatMovie({
+                        'cost': tiendaYPrecio.precio,
+                        'store': tiendaYPrecio.tienda,
+                        'addDate': new Date(dateAdded).getTime(),
+                        'title': title,
+                        'watched': !!dateWatched,
+                        'imdbLink': imdbLink,
+                        'format': 'br'
+                    })
+                })
+
+                // Llamamos a la mutación con el array de 100 películas
+                // Al ser async en el store, usamos await para no saturar al servidor
+                await this.$store.commit('addMovie', moviesBatch)
+            }
         },
         csvToArray(text) {
             let p = '',
