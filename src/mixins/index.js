@@ -21,7 +21,7 @@ export default {
             })
         },
         obtenerKeyTienda(nombre) {
-            const tiendasRegex = [
+            const tiendasReferencia = [
                 'amazon',
                 'elcorteingles',
                 'fnac',
