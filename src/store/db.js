@@ -46,7 +46,7 @@ const init = function (e) {
       // Antes de pedir detalle a la API vamos a comprobar que existe en la colección
       if (!collection.some(movie => movie.id === suggestedFromLocal.id)) {
         // Si no existe generamos una nueva
-        const suggestedTodayNew = this.getSmartDailyMovie(collection)
+        const suggestedTodayNew = getSmartDailyMovie(collection)
         baseState.suggestedToday = suggestedTodayNew
         setToLocalStorage('config.suggestedToday', suggestedTodayNew)
         return;
@@ -60,25 +60,48 @@ const init = function (e) {
               id: item.id
             }
           } else {
-            const suggestedTodayNew = this.getSmartDailyMovie(collection)
+            const suggestedTodayNew = getSmartDailyMovie(collection)
             baseState.suggestedToday = suggestedTodayNew
             setToLocalStorage('config.suggestedToday', suggestedTodayNew)
           }
         }
       )
       .catch(e => {
-        const suggestedTodayNew = this.getSmartDailyMovie(collection)
+        const suggestedTodayNew = getSmartDailyMovie(collection)
         baseState.suggestedToday = suggestedTodayNew
         setToLocalStorage('config.suggestedToday', suggestedTodayNew)
       })
 
     } else {
-      const suggestedTodayNew = this.getSmartDailyMovie(collection)
+      const suggestedTodayNew = getSmartDailyMovie(collection)
       baseState.suggestedToday = suggestedTodayNew
       setToLocalStorage('config.suggestedToday', suggestedTodayNew)
     }
 
   }).catch(console.error)
+}
+
+export const getSmartDailyMovie = collection => {
+    const today = new Date().getUTCDate() // Cambia cada día
+    const month = new Date().getUTCMonth()
+    
+    // 1. Ordenar la colección para que el índice sea predecible
+    // (Importante: .sort() afecta al array original, mejor usa una copia)
+    const sortedCollection = [...collection].sort((a, b) => a.id.localeCompare(b.id))
+
+    // 2. Filtrar preferiblemente las no vistas
+    const unwatched = sortedCollection.filter(m => !m.watched)
+    const targetList = unwatched.length > 0 ? unwatched : sortedCollection
+
+    // 3. Selección determinista basada en la fecha (día + mes para variar cada año)
+    const seed = today + month
+    const selectedMovie = targetList[seed % targetList.length]
+
+    return {
+        date: Date.now(),
+        id: selectedMovie.id,
+        isNew: !selectedMovie.watched // Meta-información útil
+    }
 }
 
 export const recalculateTotalSpent = state => {
