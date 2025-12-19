@@ -77,15 +77,16 @@ export default {
                 if (index === 0) {
                     return false
                 }
-                const dateWatched = movie[16]
+                const dateWatched = movie[17]
                 const title = movie[5]
-                const imdbLink = movie[6]
+                const imdbLink = movie[7]
                 const tiendaYPrecio = this.obtenerTiendaYPrecioDeDescripcionImdb(movie[4] || '')
+                const dateAdded = movie[2]
 
                 this.$store.commit('addMovie', this.formatMovie({
                     'cost': tiendaYPrecio.precio,
                     'store': tiendaYPrecio.tienda,
-                    'addDate': new Date(dateWatched).getTime(),
+                    'addDate': new Date(dateAdded).getTime(),
                     'title': title,
                     'watched': !!dateWatched,
                     'imdbLink': imdbLink,
