@@ -21,17 +21,18 @@ export default {
             })
         },
         obtenerKeyTienda(nombre) {
-            const tiendasReferencia = [
-                'amazon',
-                'elcorteingles',
-                'fnac',
-                'cex',
-                'carrefour',
-                'selectavision',
-                'mediamarkt',
-                'game',
-                'centromail'
-            ]
+            const tiendasReferencia = {
+                'amazon': 'amazon',
+                'elcorteingles': 'elcorteingles',
+                'eci': 'elcorteingles',
+                'fnac': 'fnac',
+                'cex': 'cex',
+                'carrefour': 'carrefour',
+                'selectavision': 'selectavision',
+                'mediamarkt': 'mediamarkt',
+                'game': 'game',
+                'centromail': 'centromail'
+            }
 
             // Normalizamos el nombre para buscar la key:
             // 1. Minúsculas 
