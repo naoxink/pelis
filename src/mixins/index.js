@@ -83,7 +83,7 @@ export default {
 
                 this.$store.commit('addMovie', this.formatMovie({
                     'cost': tiendaYPrecio.precio,
-                    'store': iendaYPrecio.tienda,
+                    'store': tiendaYPrecio.tienda,
                     'addDate': new Date(dateWatched).getTime(),
                     'title': title,
                     'watched': !!dateWatched,
