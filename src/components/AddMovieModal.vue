@@ -50,16 +50,18 @@
       }
     },
     methods: {
-      addMovie(){
+      async addMovie(){
         const _ = this
         if(!this.movie.title) return false
-        this.$store.commit('addMovie', {
-          title: _.movie.title,
-          cost: _.movie.cost,
-          store: _.movie.store,
-          imdbLink: _.movie.imdbLink,
-          format: _.movie.format || 'br'
-        })
+        await this.$store.dispatch('addMoviesBatch', [
+          {
+            title: _.movie.title,
+            cost: _.movie.cost,
+            store: _.movie.store,
+            imdbLink: _.movie.imdbLink,
+            format: _.movie.format || 'br'
+          }
+        ]);
         document.querySelector('#new-movie-title-modal').focus()
         this.showToast('Añadida', `Se ha añadido "${this.movie.title}" a la colección con un coste de ${this.movie.cost}€`, 'success')
         this.movie.title = ''
