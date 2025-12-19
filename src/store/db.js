@@ -46,10 +46,7 @@ const init = function (e) {
       // Antes de pedir detalle a la API vamos a comprobar que existe en la colección
       if (!collection.some(movie => movie.id === suggestedFromLocal.id)) {
         // Si no existe generamos una nueva
-        const suggestedTodayNew = {
-          date: Date.now(),
-          id: collection[random(0, collection.length - 1)].id
-        }
+        const suggestedTodayNew = this.getSmartDailyMovie(collection)
         baseState.suggestedToday = suggestedTodayNew
         setToLocalStorage('config.suggestedToday', suggestedTodayNew)
         return;
@@ -63,20 +60,14 @@ const init = function (e) {
               id: item.id
             }
           } else {
-            const suggestedTodayNew = {
-              date: Date.now(),
-              id: collection[random(0, collection.length - 1)].id
-            }
+            const suggestedTodayNew = this.getSmartDailyMovie(collection)
             baseState.suggestedToday = suggestedTodayNew
             setToLocalStorage('config.suggestedToday', suggestedTodayNew)
           }
         }
       )
       .catch(e => {
-        const suggestedTodayNew = {
-          date: Date.now(),
-          id: collection[random(0, collection.length - 1)].id
-        }
+        const suggestedTodayNew = this.getSmartDailyMovie(collection)
         baseState.suggestedToday = suggestedTodayNew
         setToLocalStorage('config.suggestedToday', suggestedTodayNew)
       })
