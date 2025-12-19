@@ -72,40 +72,31 @@ export default {
             return result
         },
         readImdbCSV: async function(fileData) {
-            const parsed = this.csvToArray(fileData)
-            // Eliminamos el encabezado (index 0)
-            const rows = parsed.slice(1)
+            const parsed = this.csvToArray(fileData);
+            const rows = parsed.slice(1);
+            const batchSize = 100;
             
-            const batchSize = 100
-            
-            // Iteramos por bloques de 100
             for (let i = 0; i < rows.length; i += batchSize) {
-                // Extraemos el grupo actual
-                const chunk = rows.slice(i, i + batchSize)
+                const chunk = rows.slice(i, i + batchSize);
                 
-                // Mapeamos cada fila al formato que espera tu API
                 const moviesBatch = chunk.map(movie => {
-                    const dateWatched = movie[17]
-                    const title = movie[5]
-                    const imdbLink = movie[7]
-                    const tiendaYPrecio = this.obtenerTiendaYPrecioDeDescripcionImdb(movie[4] || '')
-                    const dateAdded = movie[2]
-
+                    const tiendaYPrecio = this.obtenerTiendaYPrecioDeDescripcionImdb(movie[4] || '');
                     return this.formatMovie({
                         'cost': tiendaYPrecio.precio,
                         'store': tiendaYPrecio.tienda,
-                        'addDate': new Date(dateAdded).getTime(),
-                        'title': title,
-                        'watched': !!dateWatched,
-                        'imdbLink': imdbLink,
+                        'addDate': new Date(movie[2]).getTime(),
+                        'title': movie[5],
+                        'watched': !!movie[17],
+                        'imdbLink': movie[7],
                         'format': 'br'
-                    })
-                })
+                    });
+                });
 
-                // Llamamos a la mutación con el array de 100 películas
-                // Al ser async en el store, usamos await para no saturar al servidor
-                await this.$store.commit('addMovie', moviesBatch)
+                // Usamos dispatch y await para asegurar que el lote se procese 
+                // antes de enviar el siguiente. Esto evita colisiones.
+                await this.$store.dispatch('addMoviesBatch', moviesBatch);
             }
+            console.log("Proceso finalizado");
         },
         csvToArray(text) {
             let p = '',

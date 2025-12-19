@@ -19,31 +19,17 @@ export default new Vuex.Store({
     setCollection(state, collection) {
       state.movieCollection = collection
     },
-    addMovie: async (state, data) => {
-      // 1. Normalizamos la entrada: nos aseguramos de que data sea un array para procesarlo igual
-      const itemsToAdd = Array.isArray(data) ? data : [data];
+    saveMovieToState: (state, addedItem) => {
+      // 1. Validamos que el objeto tenga lo necesario para no corromper el estado
+      if (!addedItem) return;
 
-      // 2. Añadimos la fecha por defecto a cada película si no la tiene
-      itemsToAdd.forEach(item => {
-        if (!item.addDate) {
-          item.addDate = Date.now();
-        }
-      });
+      // 2. Insertamos en la colección
+      state.movieCollection.push(addedItem);
 
-      // 3. Enviamos a la DB (si data era array, enviamos array; si no, el objeto)
-      // Nota: Si addToDB no maneja arrays, pásale 'itemsToAdd' directamente
-      addToDB(data).then((response) => {
-        // 4. Normalizamos la respuesta del servidor
-        // El backend ahora puede devolver un objeto o un array de objetos guardados
-        const addedItems = Array.isArray(response) ? response : [response];
-
-        addedItems.forEach((addedItem) => {
-          state.movieCollection.push(addedItem);
-          state.totalSpent += +addedItem.cost;
-        });
-      }).catch(error => {
-        console.error("Error al añadir película(s):", error);
-      });
+      // 3. Sumamos al total gastado
+      // Usamos Number() o el prefijo + para asegurar que no se concatene como string
+      const cost = Number(addedItem.cost) || 0;
+      state.totalSpent += cost;
     },
     clearCollection(state) {
       clearDB().then(() => {
@@ -82,6 +68,24 @@ export default new Vuex.Store({
     getMovie({ commit, state }, data) {
       return getFromDB(data.id)
     },
+    async addMoviesBatch({ commit }, data) {
+        try {
+            // Enviamos el array (lote de 100 o el resto)
+            const response = await addToDB(data); 
+            // Normalizamos la respuesta por si el server devuelve un objeto o array
+            const addedItems = Array.isArray(response) ? response : [response];
+            
+            // Hacemos el commit para cada item o para el bloque
+            addedItems.forEach(item => {
+                commit('saveMovieToState', item);
+            });
+            
+            return addedItems;
+        } catch (error) {
+            console.error("Error en el lote:", error);
+            throw error;
+        }
+    }
   },
   modules: {
   },
