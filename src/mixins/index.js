@@ -43,8 +43,8 @@ export default {
                 .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
                 .replace(/\s+/g, '');
 
-        return tiendasReferencia.includes(keyNormalizada) 
-            ? keyNormalizada 
+        return tiendasReferencia.hasOwnProperty(keyNormalizada) 
+            ? tiendasReferencia[keyNormalizada]
             : '' // Vacío por defecto
         },
         obtenerTiendaYPrecioDeDescripcionImdb(descripcion) {
