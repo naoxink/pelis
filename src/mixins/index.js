@@ -20,22 +20,70 @@ export default {
                 toaster: 'b-toaster-top-center'
             })
         },
+        obtenerKeyTienda(nombre) {
+            const tiendasRegex = [
+                'amazon',
+                'elcorteingles',
+                'fnac',
+                'cex',
+                'carrefour',
+                'selectavision',
+                'mediamarkt',
+                'game',
+                'centromail'
+            ]
+
+            // Normalizamos el nombre para buscar la key:
+            // 1. Minúsculas 
+            // 2. Quitamos acentos (opcional pero recomendado)
+            // 3. Quitamos todos los espacios
+            const keyNormalizada = nombre
+                .toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
+                .replace(/\s+/g, '');
+
+        return tiendasReferencia.includes(keyNormalizada) 
+            ? keyNormalizada 
+            : '' // Vacío por defecto
+        },
+        obtenerTiendaYPrecioDeDescripcionImdb(descripcion) {
+            const result = { // Valores por defecto
+                tienda: '',
+                precio: 0
+            }
+
+            if (!descripcion) return result
+
+            // Explicación de la nueva RegEx:
+            // ^(.+?)            -> Grupo 1: Captura el nombre (mínimo un carácter)
+            // \s+               -> Busca el espacio antes del número
+            // ([\d.,]+)         -> Grupo 2: Captura el número (precio)
+            // \s*(?:€)?$        -> Ignora espacios opcionales y el símbolo € al final
+            const match = descripcion.match(/^(.+?)\s+([\d.,]+)\s*(?:€)?$/);
+
+            if (match) {
+                if (match[1].trim()) {
+                    result.tienda = this.obtenerKeyTienda(match[1].trim())
+                }
+                result.precio = parseFloat(match[2].replace(',', '.'))
+            }
+
+            return result
+        },
         readImdbCSV: async function(fileData) {
             const parsed = this.csvToArray(fileData)
             parsed.forEach(async(movie, index) => {
                 if (index === 0) {
                     return false
                 }
-                const id = movie[1]
                 const dateWatched = movie[16]
                 const title = movie[5]
                 const imdbLink = movie[6]
-                if (!id) return false
+                const tiendaYPrecio = this.obtenerTiendaYPrecioDeDescripcionImdb(movie[4] || '')
 
                 this.$store.commit('addMovie', this.formatMovie({
-                    'id': id,
-                    'cost': 0,
-                    'store': '',
+                    'cost': tiendaYPrecio.precio,
+                    'store': iendaYPrecio.tienda,
                     'addDate': new Date(dateWatched).getTime(),
                     'title': title,
                     'watched': !!dateWatched,
