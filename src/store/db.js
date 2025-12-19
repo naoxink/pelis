@@ -113,6 +113,7 @@ export const isToday = time => {
 export const addToDB = data => new Promise((resolve, reject) => {
   if (Array.isArray(data)) {
     data.forEach(async (item) => {
+      if (!item.title) reject('Falta título')
       try {
         await addToAPI(item)
       } catch(error) {
