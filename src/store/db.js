@@ -73,10 +73,7 @@ const init = function (e) {
       })
 
     } else {
-      const suggestedTodayNew = {
-        date: Date.now(),
-        id: collection[random(0, collection.length - 1)].id
-      }
+      const suggestedTodayNew = this.getSmartDailyMovie(collection)
       baseState.suggestedToday = suggestedTodayNew
       setToLocalStorage('config.suggestedToday', suggestedTodayNew)
     }
