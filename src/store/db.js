@@ -110,41 +110,13 @@ export const isToday = time => {
   return date === today
 }
 
-export const addToDB = data => new Promise((resolve, reject) => {
-  if (Array.isArray(data)) {
-    data.forEach(async (item) => {
-      if (!item.title) reject('Falta título')
-      try {
-        await addToAPI(item)
-      } catch(error) {
-        reject(error)
-      }
-    })
-    resolve(data)
-  } else {
-    addToAPI(data)
-      .then(resolve)
-      .catch(reject)
-  }
-})
+export const addToDB = async data => await addToAPI(data)
 
-export const getFromDB = id => new Promise((resolve, reject) => {
-  getDetailFromAPI(id)
-  .then(resolve)
-  .catch(reject)
-})
+export const getFromDB = async id => await getDetailFromAPI(id)
 
-export const removeFromDB = id => new Promise((resolve, reject) => {
-  removeFromAPI(id)
-  .then(resolve)
-  .catch(reject)
-})
+export const removeFromDB = async id => await removeFromAPI(id)
 
-export const updateFromDB = (id, data) => new Promise((resolve, reject) => {
-  updateInAPI(id, data)
-  .then(resolve)
-  .catch(reject)
-})
+export const updateFromDB = async (id, data) => await updateInAPI(id, data)
 
 export const getAllFromDB = () => new Promise((resolve, reject) => {
   getFromAPI().then(list => {

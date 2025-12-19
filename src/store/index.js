@@ -20,16 +20,8 @@ export default new Vuex.Store({
       state.movieCollection = collection
     },
     saveMovieToState: (state, addedItem) => {
-      // 1. Validamos que el objeto tenga lo necesario para no corromper el estado
-      if (!addedItem) return;
-
-      // 2. Insertamos en la colección
-      state.movieCollection.push(addedItem);
-
-      // 3. Sumamos al total gastado
-      // Usamos Number() o el prefijo + para asegurar que no se concatene como string
-      const cost = Number(addedItem.cost) || 0;
-      state.totalSpent += cost;
+        state.movieCollection.push(addedItem);
+        state.totalSpent += Number(addedItem.cost) || 0;
     },
     clearCollection(state) {
       clearDB().then(() => {
@@ -69,22 +61,13 @@ export default new Vuex.Store({
       return getFromDB(data.id)
     },
     async addMoviesBatch({ commit }, data) {
-        try {
-            // Enviamos el array (lote de 100 o el resto)
-            const response = await addToDB(data); 
-            // Normalizamos la respuesta por si el server devuelve un objeto o array
-            const addedItems = Array.isArray(response) ? response : [response];
-            
-            // Hacemos el commit para cada item o para el bloque
-            addedItems.forEach(item => {
-                commit('saveMovieToState', item);
-            });
-            
-            return addedItems;
-        } catch (error) {
-            console.error("Error en el lote:", error);
-            throw error;
-        }
+        // La data aquí es el array de 100 (o el resto de 5)
+        const response = await addToDB(data); 
+        const addedItems = Array.isArray(response) ? response : [response];
+        
+        addedItems.forEach(item => {
+            commit('saveMovieToState', item);
+        });
     }
   },
   modules: {

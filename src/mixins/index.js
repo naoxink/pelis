@@ -73,30 +73,47 @@ export default {
         },
         readImdbCSV: async function(fileData) {
             const parsed = this.csvToArray(fileData);
-            const rows = parsed.slice(1);
+            
+            // 1. Limpieza: Quitamos cabecera y filtramos filas sin título (columna 5)
+            const validRows = parsed.slice(1).filter(movie => movie[5] && movie[5].trim() !== '');
+            
             const batchSize = 100;
             
-            for (let i = 0; i < rows.length; i += batchSize) {
-                const chunk = rows.slice(i, i + batchSize);
+            // 2. Procesamos por lotes
+            for (let i = 0; i < validRows.length; i += batchSize) {
+                const chunk = validRows.slice(i, i + batchSize);
                 
+                // 3. Mapeamos cada fila usando formatMovie
                 const moviesBatch = chunk.map(movie => {
+                    const dateWatched = movie[17];
+                    const title = movie[5];
+                    const imdbLink = movie[7];
+                    const dateAdded = movie[2];
                     const tiendaYPrecio = this.obtenerTiendaYPrecioDeDescripcionImdb(movie[4] || '');
+
+                    // Aquí integramos tu función formatMovie
                     return this.formatMovie({
                         'cost': tiendaYPrecio.precio,
                         'store': tiendaYPrecio.tienda,
-                        'addDate': new Date(movie[2]).getTime(),
-                        'title': movie[5],
-                        'watched': !!movie[17],
-                        'imdbLink': movie[7],
+                        'addDate': new Date(dateAdded).getTime(),
+                        'title': title,
+                        'watched': !!dateWatched,
+                        'imdbLink': imdbLink,
                         'format': 'br'
                     });
                 });
 
-                // Usamos dispatch y await para asegurar que el lote se procese 
-                // antes de enviar el siguiente. Esto evita colisiones.
-                await this.$store.dispatch('addMoviesBatch', moviesBatch);
+                // 4. Enviamos el lote al store y esperamos a que termine
+                try {
+                    await this.$store.dispatch('addMoviesBatch', moviesBatch);
+                    console.log(`Lote de ${moviesBatch.length} películas procesado.`);
+                } catch (error) {
+                    console.error("Error procesando lote:", error);
+                    // Opcional: break; si quieres detener todo si un lote falla
+                }
             }
-            console.log("Proceso finalizado");
+            
+            console.log("Importación masiva completada con éxito.");
         },
         csvToArray(text) {
             let p = '',
